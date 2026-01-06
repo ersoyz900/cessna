@@ -1,0 +1,59 @@
+﻿@page "/hostes/create"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@inject CessnasContext Db
+@inject NavigationManager Nav
+
+<h3>Yeni Hostes</h3>
+
+@if (!string.IsNullOrEmpty(Hata))
+{
+    <div class="alert alert-danger">@Hata</div>
+}
+
+<EditForm Model="Model" OnValidSubmit="Kaydet">
+    <div class="mb-3">
+        <label>Ad Soyad *</label>
+        <InputText class="form-control" @bind-Value="Model.AdSoyad" />
+    </div>
+
+    <div class="mb-3">
+        <label>Deneyim (Yıl)</label>
+        <InputNumber class="form-control" @bind-Value="Model.DeneyimYil" />
+    </div>
+
+    <div class="mb-3">
+        <label>Vardiya</label>
+        <InputText class="form-control" @bind-Value="Model.Vardiya" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+    <a class="btn btn-secondary ms-2" href="/hostes">İptal</a>
+</EditForm>
+
+@code {
+    Hoste Model = new();
+    string? Hata;
+
+    void Kaydet()
+    {
+        if (string.IsNullOrWhiteSpace(Model.AdSoyad))
+        {
+            Hata = "Ad Soyad zorunludur.";
+            return;
+        }
+
+        try
+        {
+            Db.Set<Hoste>().Add(Model);
+            Db.SaveChanges();
+            Nav.NavigateTo("/hostes", true);
+        }
+        catch (Exception ex)
+        {
+            Hata = ex.Message;
+        }
+    }
+}
+

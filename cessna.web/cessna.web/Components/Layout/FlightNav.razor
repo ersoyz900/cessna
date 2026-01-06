@@ -1,0 +1,119 @@
+﻿<nav class="sidebar">
+
+    <div class="sidebar-title">
+        CESSNA
+    </div>
+
+    <!-- HOME -->
+    <NavLink href="/" Match="NavLinkMatch.All" class="menu-item">
+        Home
+    </NavLink>
+
+    <!-- HOME İLE BAĞLI ANA ENTITYLER -->
+    <div class="menu-section">
+        <div class="menu-header">MAIN MODULES</div>
+
+        <NavLink href="/yolcu" class="menu-item">
+            Passengers
+        </NavLink>
+        <NavLink href="/ucak" class="menu-item">
+            Aircraft
+        </NavLink>
+
+        <NavLink href="/pilot" class="menu-item">
+            Pilots
+        </NavLink>
+
+        <NavLink href="/havalimani" class="menu-item">
+            Airports
+        </NavLink>
+    </div>
+    
+    <NavLink href="/hostes" class="menu-item">
+        Hosteses
+    </NavLink>
+    <NavLink href="/ucus" class="menu-item">
+        Flights
+    </NavLink>
+
+    <NavLink href="/teknisyen" class="menu-item">
+        Technicians
+    </NavLink>
+    <!-- DİĞER ENTITYLER -->
+    <div class="menu-section">
+        <div class="menu-header">OTHER ENTITIES</div>
+
+        <NavLink href="/rezervasyon" class="menu-item">
+            Reservations
+        </NavLink>
+
+
+        <NavLink href="/koltuk" class="menu-item">
+            Seats
+        </NavLink>
+
+        <NavLink href="/hazirlikkontrol" class="menu-item">
+            Pre-Flight Checks
+        </NavLink>
+
+        <!-- 🔥 YAKIT (FUEL) -->
+        <NavLink href="/yakit" class="menu-item">
+            Fuel
+        </NavLink>
+    </div>
+
+</nav>
+
+<style>
+    .sidebar {
+        height: 100vh;
+        background: linear-gradient(180deg, #0f172a, #020617);
+        padding: 24px 20px;
+        color: white;
+        font-family: 'Segoe UI', Arial, sans-serif;
+        overflow-y: auto;
+    }
+
+    .sidebar-title {
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: 4px;
+        margin-bottom: 28px;
+        color: #0dcaf0;
+    }
+
+    .menu-section {
+        margin-top: 26px;
+    }
+
+    .menu-header {
+        font-size: 0.75rem;
+        letter-spacing: 2.2px;
+        color: rgba(255,255,255,0.6);
+        margin-bottom: 14px;
+        padding-left: 8px;
+    }
+
+    .menu-item {
+        display: block;
+        padding: 14px 18px;
+        margin-bottom: 10px;
+        border-radius: 12px;
+        color: white;
+        text-decoration: none;
+        transition: all 0.25s ease;
+        font-size: 0.95rem;
+    }
+
+        .menu-item:hover {
+            background: rgba(13, 202, 240, 0.2);
+            transform: translateX(8px);
+        }
+
+        .menu-item.active {
+            background: rgba(13, 202, 240, 0.35);
+            border-left: 4px solid #0dcaf0;
+            font-weight: 600;
+        }
+</style>

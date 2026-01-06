@@ -1,0 +1,103 @@
+﻿@page "/hazirlikkontrol/edit/{teknisyenKod:int}/{ucakKod:int}/{ucusKod:int}"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@using Microsoft.EntityFrameworkCore
+@inject CessnasContext Db
+@inject NavigationManager Nav
+
+<h3>Edit Inspection</h3>
+
+@if (!string.IsNullOrEmpty(Hata))
+{
+    <div class="alert alert-danger">@Hata</div>
+}
+
+@if (Model == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div class="mb-3">
+        <label>Preparation Time</label>
+        <input type="datetime-local"
+               class="form-control"
+               value="@HazirlikZamaniText"
+               @onchange="OnTimeChanged" />
+    </div>
+
+    <div class="mb-3">
+        <label>Notes</label>
+        <textarea class="form-control"
+                  rows="3"
+                  @bind="Model.Notlar"></textarea>
+    </div>
+
+    <button class="btn btn-primary" @onclick="Save">Save</button>
+    <a class="btn btn-secondary ms-2" href="/hazirlikkontrol">Cancel</a>
+}
+
+@code {
+    [Parameter] public int teknisyenKod { get; set; }
+    [Parameter] public int ucakKod { get; set; }
+    [Parameter] public int ucusKod { get; set; }
+
+    HazirlikKontrol? Model;
+    string? Hata;
+
+    // 🔑 DATETIME STRING ARA KATMAN
+    string HazirlikZamaniText = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        Model = await Db.Set<HazirlikKontrol>()
+            .FirstOrDefaultAsync(x =>
+                x.TeknisyenKod == teknisyenKod &&
+                x.UcakKod == ucakKod &&
+                x.UcusKod == ucusKod);
+
+        if (Model == null)
+        {
+            Hata = "Inspection not found.";
+            return;
+        }
+
+        // NULL ise boş bırak, doluysa formatla
+        if (Model.HazirlikZamani.HasValue)
+        {
+            HazirlikZamaniText =
+                Model.HazirlikZamani.Value.ToString("yyyy-MM-ddTHH:mm");
+        }
+    }
+
+    void OnTimeChanged(ChangeEventArgs e)
+    {
+        HazirlikZamaniText = e.Value?.ToString() ?? "";
+    }
+
+    async Task Save()
+    {
+        if (Model == null)
+            return;
+
+        // STRING → DATETIME DÖNÜŞÜM
+        if (!string.IsNullOrWhiteSpace(HazirlikZamaniText))
+        {
+            if (DateTime.TryParse(HazirlikZamaniText, out var dt))
+                Model.HazirlikZamani = dt;
+            else
+            {
+                Hata = "Invalid date/time format.";
+                return;
+            }
+        }
+        else
+        {
+            Model.HazirlikZamani = null;
+        }
+
+        await Db.SaveChangesAsync();
+        Nav.NavigateTo("/hazirlikkontrol", true);
+    }
+}

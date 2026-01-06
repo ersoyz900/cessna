@@ -1,0 +1,143 @@
+﻿@page "/koltuk/edit/{ucakKod:int}/{koltukNo}"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@using Microsoft.EntityFrameworkCore
+@inject CessnasContext Db
+@inject NavigationManager Nav
+
+<h3>Edit Seat</h3>
+
+@if (!string.IsNullOrEmpty(Hata))
+{
+    <div class="alert alert-danger">@Hata</div>
+}
+
+@if (Model == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <!-- UÇAK SEÇİMİ (TÜM DATABASE'DEN GELİR) -->
+    <div class="mb-3">
+        <label>Uçak Modeli</label>
+        <select class="form-control" @onchange="OnUcakChanged">
+            <option value="">-- Uçak Seçiniz --</option>
+
+            @foreach (var u in Ucaklar)
+            {
+                <option value="@u.UcakKod"
+                        selected="@(u.UcakKod == SeciliUcakKod)">
+                    @u.Model
+                </option>
+            }
+        </select>
+    </div>
+
+    <!-- KOLTUK NO -->
+    <div class="mb-2">
+        <label>Koltuk No</label>
+        <input class="form-control" @bind="Model.KoltukNo" />
+    </div>
+
+    <!-- KOLTUK TİPİ -->
+    <div class="mb-2">
+        <label>Koltuk Tipi</label>
+        <select class="form-control" @bind="Model.KoltukTipi">
+            <option value="">-</option>
+            <option>Economy</option>
+            <option>Business</option>
+        </select>
+    </div>
+
+    <!-- DİZ MESAFESİ -->
+    <div class="mb-2">
+        <label>Diz Mesafesi (cm)</label>
+        <input type="number" class="form-control" @bind="Model.DizMesafesi" />
+    </div>
+
+    <button class="btn btn-primary" @onclick="Save">Save</button>
+    <a class="btn btn-secondary ms-2" href="/koltuk">Cancel</a>
+}
+
+@code {
+    // URL PARAMETRELERİ
+    [Parameter] public int ucakKod { get; set; }
+    [Parameter] public string koltukNo { get; set; } = string.Empty;
+
+    Koltuk? Model;
+    string? Hata;
+
+    // TÜM UÇAKLAR
+    List<Ucak> Ucaklar = new();
+
+    // SEÇİLİ UÇAK
+    int SeciliUcakKod;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // 1️⃣ KOLTUK
+        Model = await Db.Set<Koltuk>()
+            .FirstOrDefaultAsync(k =>
+                k.UcakKod == ucakKod &&
+                k.KoltukNo == koltukNo);
+
+        if (Model == null)
+        {
+            Hata = "Seat not found.";
+            return;
+        }
+
+        // 2️⃣ TÜM UÇAKLAR (HİÇ FİLTRE YOK)
+        Ucaklar = await Db.Set<Ucak>()
+            .AsNoTracking()
+            .OrderBy(u => u.Model)
+            .ToListAsync();
+
+        // 3️⃣ MEVCUT UÇAK SEÇİLİ
+        SeciliUcakKod = Model.UcakKod;
+    }
+
+    void OnUcakChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out var yeniKod))
+        {
+            SeciliUcakKod = yeniKod;
+        }
+    }
+
+    async Task Save()
+    {
+        if (Model == null)
+            return;
+
+        if (SeciliUcakKod == 0)
+        {
+            Hata = "Lütfen bir uçak seçiniz.";
+            return;
+        }
+
+        // UÇAK GÜNCELLE
+        Model.UcakKod = SeciliUcakKod;
+
+        // ÇAKIŞMA KONTROLÜ
+        bool cakisma = await Db.Set<Koltuk>().AnyAsync(k =>
+            k.UcakKod == Model.UcakKod &&
+            k.KoltukNo == Model.KoltukNo &&
+            !(k.UcakKod == ucakKod && k.KoltukNo == koltukNo));
+
+        if (cakisma)
+        {
+            Hata = "Bu uçakta bu koltuk numarası zaten mevcut.";
+            return;
+        }
+
+        Db.Update(Model);
+        await Db.SaveChangesAsync();
+
+        Nav.NavigateTo("/koltuk", forceLoad: true);
+    }
+}
+
+

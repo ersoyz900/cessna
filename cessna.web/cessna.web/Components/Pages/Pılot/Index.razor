@@ -1,0 +1,48 @@
+﻿@page "/pilot"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@using Microsoft.EntityFrameworkCore
+@inject CessnasContext Db
+
+<h3>Pilots</h3>
+
+<a class="btn btn-success mb-3" href="/pilot/create">New Pilot</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Ad Soyad</th>
+            <th>Lisans No</th>
+            <th>Deneyim (Yıl)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var p in Pilotlar)
+        {
+            <tr>
+                <td>@p.AdSoyad</td>
+                <td>@p.LisansNo</td>
+                <td>@p.DeneyimYil</td>
+                <td>
+                    <a class="btn btn-sm btn-primary"
+                       href="/pilot/edit/@p.PilotKod">Edit</a>
+                    <a class="btn btn-sm btn-danger ms-1"
+                       href="/pilot/delete/@p.PilotKod">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    List<Pilot> Pilotlar = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Pilotlar = await Db.Set<Pilot>()
+                           .AsNoTracking()
+                           .ToListAsync();
+    }
+}

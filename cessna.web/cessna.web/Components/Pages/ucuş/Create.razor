@@ -1,0 +1,89 @@
+﻿@page "/ucus/create"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@inject CessnasContext Db
+@inject NavigationManager Nav
+
+<h3>Create Flight</h3>
+
+@if (!string.IsNullOrEmpty(Mesaj))
+{
+    <div class="alert alert-danger">@Mesaj</div>
+}
+
+<div class="mb-3">
+    <label>Flight No</label>
+    <input class="form-control" @bind="UcusNo" />
+</div>
+
+<div class="mb-3">
+    <label>Status</label>
+    <input class="form-control" @bind="Durum" />
+</div>
+
+<div class="mb-3">
+    <label>Departure</label>
+    <input type="datetime-local" class="form-control" @bind="Kalkis" />
+</div>
+
+<div class="mb-3">
+    <label>Arrival</label>
+    <input type="datetime-local" class="form-control" @bind="Varis" />
+</div>
+
+<button type="button"
+        class="btn btn-primary"
+        @onclick="Save">
+    Save
+</button>
+
+@code {
+    string? UcusNo;
+    string? Durum;
+    DateTime? Kalkis;
+    DateTime? Varis;
+
+    string? Mesaj;
+
+    void Save()
+    {
+        Mesaj = null;
+
+        if (string.IsNullOrWhiteSpace(UcusNo))
+        {
+            Mesaj = "Flight No is required.";
+            return;
+        }
+
+        if (Kalkis == null || Varis == null)
+        {
+            Mesaj = "Dates are required.";
+            return;
+        }
+
+        if (Varis <= Kalkis)
+        {
+            Mesaj = "Arrival must be later than departure.";
+            return;
+        }
+
+        var u = new Ucu
+        {
+            UcusNo = UcusNo.Trim(),
+            Durum = Durum,
+            KalkisZamani = Kalkis,
+            VarisZamani = Varis,
+
+            UcakKod = 1,
+            PilotKod = 1,
+            KalkisHavalimaniKod = 1,
+            VarisHavalimaniKod = 2
+        };
+
+        Db.Ucus.Add(u);
+        Db.SaveChanges();
+
+        Nav.NavigateTo("/ucus", forceLoad: true);
+    }
+}

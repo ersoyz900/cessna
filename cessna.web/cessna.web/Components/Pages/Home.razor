@@ -1,0 +1,186 @@
+﻿@page "/"
+@using cessna.web.Models
+@using Microsoft.EntityFrameworkCore
+@inject CessnasContext Db
+
+<style>
+    html, body {
+        margin: 0;
+        padding: 0;
+    }
+
+    .home-bg {
+        width: 100%;
+        min-height: 100vh;
+        background-image: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.65)), url('https://images.unsplash.com/photo-1540962351504-03099e0a754b?q=80&w=2000');
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-family: 'Segoe UI', Arial, sans-serif;
+    }
+
+    .glass-panel {
+        width: 95%;
+        max-width: 1400px;
+        padding: 45px;
+        background: rgba(255,255,255,0.08);
+        backdrop-filter: blur(18px);
+        border-radius: 24px;
+        box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+    }
+
+    .home-title {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+        .home-title h1 {
+            font-size: 3rem;
+            letter-spacing: 6px;
+            margin: 0;
+        }
+
+    .card-row {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 18px;
+    }
+
+    .home-card {
+        padding: 18px;
+        border-radius: 16px;
+        text-align: center;
+        color: white;
+        background: rgba(0,0,0,0.35);
+        border: 1.5px solid rgba(13,202,240,0.7);
+        text-decoration: none;
+        font-size: 0.95rem;
+    }
+
+    .chart-box {
+        margin-top: 35px;
+        padding: 25px;
+        background: rgba(0,0,0,0.35);
+        border-radius: 18px;
+        border: 1.5px solid rgba(13,202,240,0.7);
+    }
+
+    .bar {
+        height: 18px;
+        background: #0dcaf0;
+        border-radius: 10px;
+    }
+
+    .bar-purple {
+        height: 18px;
+        background: #6f42c1;
+        border-radius: 10px;
+    }
+</style>
+
+<div class="home-bg">
+    <div class="glass-panel">
+
+        <div class="home-title">
+            <h1>CESSNA</h1>
+            <p>Flight Management System</p>
+        </div>
+
+        <!-- 🔹 TÜM BUTONLAR -->
+        <div class="card-row">
+            <NavLink class="home-card" href="/ucus">Flights</NavLink>
+            <NavLink class="home-card" href="/yolcu">Passengers</NavLink>
+            <NavLink class="home-card" href="/ucak">Aircraft</NavLink>
+            <NavLink class="home-card" href="/pilot">Pilots</NavLink>
+            <NavLink class="home-card" href="/hostes">Hostesses</NavLink>
+            <NavLink class="home-card" href="/teknisyen">Technicians</NavLink>
+            <NavLink class="home-card" href="/havalimani">Airports</NavLink>
+            <NavLink class="home-card" href="/koltuk">Seats</NavLink>
+            <NavLink class="home-card" href="/hazirlikkontrol">Pre-Flight</NavLink>
+            <NavLink class="home-card" href="/yakit">Fuel</NavLink>
+        </div>
+
+        <!-- 🔵 FUEL GRAFİĞİ -->
+        <div class="chart-box">
+            <h3>Fuel Cost Overview</h3>
+
+            @foreach (var item in FuelData)
+            {
+                <div style="margin-bottom:12px">
+                    <strong>@item.Aircraft</strong> — @item.Total ₺
+                    <div class="bar" style="width:@item.Percent%"></div>
+                </div>
+            }
+        </div>
+
+        <!-- 🟣 OPERATIONAL GRAFİK -->
+        <div class="chart-box">
+            <h3>Operational Staff, Airports & Seats Overview</h3>
+
+            @foreach (var item in OperationalData)
+            {
+                <div style="margin-bottom:12px">
+                    <strong>@item.Name</strong> — @item.Count
+                    <div class="bar-purple" style="width:@item.Percent%"></div>
+                </div>
+            }
+        </div>
+
+    </div>
+</div>
+
+@code {
+    record FuelRow(string Aircraft, double Total, double Percent);
+    record OperationalRow(string Name, int Count, double Percent);
+
+    List<FuelRow> FuelData = new();
+    List<OperationalRow> OperationalData = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadDashboardAsync();
+    }
+
+    async Task LoadDashboardAsync()
+    {
+        // ---------- FUEL ----------
+        var yakits = await Db.Set<Yakit>()
+            .Include(y => y.UcusKodNavigation)
+                .ThenInclude(u => u.UcakKodNavigation)
+            .AsNoTracking()
+            .ToListAsync();
+
+        var fuelGrouped = yakits
+            .GroupBy(y => y.UcusKodNavigation?.UcakKodNavigation?.KuyrukNo ?? "No Aircraft")
+            .Select(g => new { Aircraft = g.Key, Total = g.Sum(x => x.ToplamTutar) })
+            .ToList();
+
+        var maxFuel = fuelGrouped.Any() ? fuelGrouped.Max(x => x.Total) : 1;
+
+        FuelData = fuelGrouped
+            .Select(x => new FuelRow(x.Aircraft, x.Total, (x.Total / maxFuel) * 100))
+            .ToList();
+
+        // ---------- OPERATIONAL ----------
+        var pilots = await Db.Set<Pilot>().CountAsync();
+        var hostes = await Db.Set<Hoste>().CountAsync();
+        var teknisyen = await Db.Set<Teknisyen>().CountAsync();
+        var airport = await Db.Set<Havalimani>().CountAsync();
+        var seats = await Db.Set<cessna.web.Models.Koltuk>().CountAsync(); // ✅ HATA YOK
+
+        var max = new[] { pilots, hostes, teknisyen, airport, seats }.Max();
+        if (max == 0) max = 1;
+
+        OperationalData = new()
+        {
+            new("Pilots", pilots, pilots * 100.0 / max),
+            new("Hostesses", hostes, hostes * 100.0 / max),
+            new("Technicians", teknisyen, teknisyen * 100.0 / max),
+            new("Airports", airport, airport * 100.0 / max),
+            new("Seats", seats, seats * 100.0 / max)
+        };
+    }
+}

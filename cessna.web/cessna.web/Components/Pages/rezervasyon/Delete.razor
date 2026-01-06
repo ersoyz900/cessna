@@ -1,0 +1,57 @@
+﻿@page "/rezervasyon/delete/{id:int}"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@using Microsoft.EntityFrameworkCore
+@inject CessnasContext Db
+@inject NavigationManager Nav
+
+<h3>Delete Reservation</h3>
+
+@if (!string.IsNullOrEmpty(Hata))
+{
+    <div class="alert alert-danger">@Hata</div>
+}
+
+@if (Model == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <p>
+        Rezervasyon <strong>@Model.RezervasyonKod</strong> silinsin mi?
+    </p>
+
+    <button class="btn btn-danger" @onclick="ConfirmDelete">Delete</button>
+    <a class="btn btn-secondary ms-2" href="/rezervasyon">Cancel</a>
+}
+
+@code {
+    [Parameter] public int id { get; set; }
+
+    Rezervasyon? Model;
+    string? Hata;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Model = await Db.Set<Rezervasyon>()
+                        .FirstOrDefaultAsync(x => x.RezervasyonKod == id);
+    }
+
+    async Task ConfirmDelete()
+    {
+        if (Model == null) return;
+
+        try
+        {
+            Db.Set<Rezervasyon>().Remove(Model);
+            await Db.SaveChangesAsync();
+            Nav.NavigateTo("/rezervasyon", forceLoad: true);
+        }
+        catch
+        {
+            Hata = "Bu rezervasyon başka kayıtlarla ilişkili olduğu için silinemiyor.";
+        }
+    }
+}

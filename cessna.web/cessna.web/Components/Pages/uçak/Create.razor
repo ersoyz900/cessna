@@ -1,0 +1,129 @@
+﻿@page "/ucak/create"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@inject CessnasContext Db
+@inject NavigationManager Nav
+
+<h3>Create Cessna Aircraft</h3>
+
+@if (!string.IsNullOrEmpty(Hata))
+{
+    <div class="alert alert-danger">@Hata</div>
+}
+
+<div class="mb-3">
+    <label>Kuyruk No *</label>
+    <input class="form-control" @bind="KuyrukNo" />
+</div>
+
+<div class="mb-3">
+    <label>Model *</label>
+    <select class="form-select" @bind="Model">
+        <option value="">Select Cessna model...</option>
+        @foreach (var m in CessnaModelleri)
+        {
+            <option value="@m">@m</option>
+        }
+    </select>
+</div>
+
+<div class="mb-3">
+    <label>Üretici</label>
+    <input class="form-control" value="Cessna" disabled />
+</div>
+
+<div class="mb-3">
+    <label>Kapasite</label>
+    <select class="form-select" @bind="Kapasite">
+        <option value="">Select capacity...</option>
+        @foreach (var k in KapasiteSecenekleri)
+        {
+            <option value="@k">@k</option>
+        }
+    </select>
+</div>
+
+<div class="mb-3">
+    <label>Üretim Yılı</label>
+    <select class="form-select" @bind="UretimYili">
+        <option value="">Select year...</option>
+        @foreach (var y in UretimYiliSecenekleri)
+        {
+            <option value="@y">@y</option>
+        }
+    </select>
+</div>
+
+<button type="button" class="btn btn-primary" @onclick="Save">
+    Save
+</button>
+
+<a class="btn btn-secondary ms-2" href="/ucak">
+    Cancel
+</a>
+
+@code {
+    // FORM ALANLARI (NULL UYARISI YOK)
+    string KuyrukNo = "";
+    string Model = "";
+
+    // ÜRETİCİ SABİT
+    readonly string Uretici = "Cessna";
+
+    int? Kapasite;
+    int? UretimYili;
+
+    string? Hata;
+
+    // CESSNA MODELLERİ (DB mantığına uygun)
+    List<string> CessnaModelleri = new()
+    {
+        "Cessna 172 Skyhawk",
+        "Cessna 182 Skylane",
+        "Cessna 208 Caravan",
+        "Cessna Citation CJ4",
+        "Cessna Citation XLS+"
+    };
+
+    // KAPASİTE SEÇENEKLERİ
+    List<int> KapasiteSecenekleri = new()
+    {
+        2, 4, 6, 8, 10, 12
+    };
+
+    // ÜRETİM YILI SEÇENEKLERİ
+    List<int> UretimYiliSecenekleri =
+        Enumerable.Range(1990, DateTime.Now.Year - 1989).ToList();
+
+    void Save()
+    {
+        Hata = null;
+
+        if (string.IsNullOrWhiteSpace(KuyrukNo))
+        {
+            Hata = "Kuyruk No is required.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(Model))
+        {
+            Hata = "Model is required.";
+            return;
+        }
+
+        var yeniUcak = new Ucak
+        {
+            KuyrukNo = KuyrukNo,
+            Model = Model,
+            Uretici = Uretici,   // DAİMA CESSNA
+            Kapasite = Kapasite,
+            UretimYili = UretimYili
+        };
+
+        Db.Ucaks.Add(yeniUcak);
+        Db.SaveChanges();
+
+        Nav.NavigateTo("/ucak", forceLoad: true);
+    }
+}

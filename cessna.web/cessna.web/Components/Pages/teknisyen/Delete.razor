@@ -1,0 +1,80 @@
+﻿@page "/teknisyen/delete/{id:int}"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@using Microsoft.EntityFrameworkCore
+@inject CessnasContext Db
+@inject NavigationManager Nav
+
+<h3>Teknisyen Sil</h3>
+
+@if (!string.IsNullOrEmpty(Hata))
+{
+    <div class="alert alert-danger">
+        @Hata
+    </div>
+}
+
+@if (Model == null)
+{
+    <p>Yükleniyor...</p>
+}
+else
+{
+    <p>
+        <strong>@Model.AdSoyad</strong> adlı teknisyeni silmek istediğinize emin misiniz?
+    </p>
+
+    <button class="btn btn-danger" @onclick="ConfirmDelete">
+        Sil
+    </button>
+
+    <a class="btn btn-secondary ms-2" href="/teknisyen">
+        İptal
+    </a>
+}
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+
+    Teknisyen? Model;
+    string? Hata;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Model = await Db.Set<Teknisyen>()
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(t => t.TeknisyenKod == id);
+
+        if (Model == null)
+        {
+            Hata = "Teknisyen bulunamadı.";
+        }
+    }
+
+    async Task ConfirmDelete()
+    {
+        if (Model == null)
+            return;
+
+        try
+        {
+            // Yeniden attach (AsNoTracking kullandığımız için)
+            Db.Attach(Model);
+            Db.Set<Teknisyen>().Remove(Model);
+
+            await Db.SaveChangesAsync();
+
+            Nav.NavigateTo("/teknisyen", true);
+        }
+        catch (DbUpdateException)
+        {
+            Hata = "Bu teknisyen başka kayıtlarla ilişkili olduğu için silinemiyor.";
+        }
+        catch (Exception ex)
+        {
+            Hata = ex.Message;
+        }
+    }
+}

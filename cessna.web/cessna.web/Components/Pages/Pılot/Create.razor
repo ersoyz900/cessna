@@ -1,0 +1,60 @@
+﻿@page "/pilot/create"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@inject CessnasContext Db
+@inject NavigationManager Nav
+
+<h3>Create Pilot</h3>
+
+@if (!string.IsNullOrEmpty(Hata))
+{
+    <div class="alert alert-danger">@Hata</div>
+}
+
+<div class="mb-3">
+    <label>Ad Soyad *</label>
+    <input class="form-control" @bind="AdSoyad" />
+</div>
+
+<div class="mb-3">
+    <label>Lisans No *</label>
+    <input class="form-control" @bind="LisansNo" />
+</div>
+
+<div class="mb-3">
+    <label>Deneyim (Yıl)</label>
+    <input type="number" class="form-control" @bind="DeneyimYil" />
+</div>
+
+<button type="button" class="btn btn-primary" @onclick="Save">Save</button>
+<a class="btn btn-secondary ms-2" href="/pilot">Cancel</a>
+
+@code {
+    string? AdSoyad;
+    string? LisansNo;
+    int? DeneyimYil;
+    string? Hata;
+
+    void Save()
+    {
+        if (string.IsNullOrWhiteSpace(AdSoyad) ||
+            string.IsNullOrWhiteSpace(LisansNo))
+        {
+            Hata = "Ad Soyad and Lisans No are required.";
+            return;
+        }
+
+        var p = new Pilot
+        {
+            AdSoyad = AdSoyad!,
+            LisansNo = LisansNo!,
+            DeneyimYil = DeneyimYil
+        };
+
+        Db.Set<Pilot>().Add(p);
+        Db.SaveChanges();
+
+        Nav.NavigateTo("/pilot", forceLoad: true);
+    }
+}

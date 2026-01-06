@@ -1,0 +1,52 @@
+﻿@page "/ucak"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@using Microsoft.EntityFrameworkCore
+@inject CessnasContext Db
+
+<h3>Aircraft</h3>
+
+<a class="btn btn-success mb-3" href="/ucak/create">New Aircraft</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Kuyruk No</th>
+            <th>Model</th>
+            <th>Üretici</th>
+            <th>Kapasite</th>
+            <th>Üretim Yılı</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var u in Ucaklar)
+        {
+            <tr>
+                <td>@u.KuyrukNo</td>
+                <td>@u.Model</td>
+                <td>@u.Uretici</td>
+                <td>@u.Kapasite</td>
+                <td>@u.UretimYili</td>
+                <td>
+                    <a class="btn btn-sm btn-primary"
+                       href="/ucak/edit/@u.UcakKod">Edit</a>
+                    <a class="btn btn-sm btn-danger ms-1"
+                       href="/ucak/delete/@u.UcakKod">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    List<Ucak> Ucaklar = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Ucaklar = await Db.Set<Ucak>()
+                          .AsNoTracking()
+                          .ToListAsync();
+    }
+}

@@ -1,0 +1,53 @@
+﻿@page "/yakit/delete/{id:int}"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@using Microsoft.EntityFrameworkCore
+@inject CessnasContext Db
+@inject NavigationManager Nav
+
+<h3>Delete Fuel Record</h3>
+
+@if (!string.IsNullOrEmpty(Hata))
+{
+    <div class="alert alert-danger">@Hata</div>
+}
+
+@if (Model == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <p>
+        Delete fuel record <strong>#@Model.YakitKod</strong> ?
+    </p>
+
+    <button class="btn btn-danger" @onclick="ConfirmDelete">Confirm Delete</button>
+    <a class="btn btn-secondary ms-2" href="/yakit">Cancel</a>
+}
+
+@code {
+    [Parameter] public int id { get; set; }
+
+    Yakit? Model;
+    string? Hata;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Model = await Db.Set<Yakit>().FirstOrDefaultAsync(x => x.YakitKod == id);
+        if (Model == null)
+            Hata = "Fuel record not found.";
+    }
+
+    async Task ConfirmDelete()
+    {
+        if (Model == null) return;
+
+        Db.Remove(Model);
+        await Db.SaveChangesAsync();
+
+        Nav.NavigateTo("/yakit", true);
+    }
+}
+

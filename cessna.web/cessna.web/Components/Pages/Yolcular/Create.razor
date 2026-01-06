@@ -1,0 +1,83 @@
+﻿@page "/yolcu/create"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@inject CessnasContext Db
+@inject NavigationManager Nav
+
+<h3>Create Passenger</h3>
+
+@if (!string.IsNullOrEmpty(Hata))
+{
+    <div class="alert alert-danger">@Hata</div>
+}
+
+<div class="mb-2">
+    <label>Ad Soyad *</label>
+    <input class="form-control" @bind="AdSoyad" />
+</div>
+
+<div class="mb-2">
+    <label>Pasaport No *</label>
+    <input class="form-control" @bind="PasaportNo" />
+</div>
+
+<div class="mb-2">
+    <label>Cinsiyet</label>
+    <input class="form-control" @bind="Cinsiyet" />
+</div>
+
+<div class="mb-2">
+    <label>Doğum Tarihi</label>
+    <input type="date" class="form-control" @bind="DogumTarihi" />
+</div>
+
+<div class="mb-2">
+    <label>Telefon</label>
+    <input class="form-control" @bind="Telefon" />
+</div>
+
+<div class="mb-2">
+    <label>E-posta</label>
+    <input class="form-control" @bind="Eposta" />
+</div>
+
+<button class="btn btn-primary" @onclick="Save">Save</button>
+<a class="btn btn-secondary ms-2" href="/yolcu">Cancel</a>
+
+@code {
+    string? AdSoyad;
+    string? PasaportNo;
+    string? Cinsiyet;
+    DateOnly? DogumTarihi;
+    string? Telefon;
+    string? Eposta;
+    string? Hata;
+
+    void Save()
+    {
+        Hata = null;
+
+        if (string.IsNullOrWhiteSpace(AdSoyad) ||
+            string.IsNullOrWhiteSpace(PasaportNo))
+        {
+            Hata = "Ad Soyad ve Pasaport No zorunludur.";
+            return;
+        }
+
+        var y = new Yolcu
+        {
+            AdSoyad = AdSoyad!,
+            PasaportNo = PasaportNo!,
+            Cinsiyet = Cinsiyet,
+            DogumTarihi = DogumTarihi,
+            Telefon = Telefon,
+            Eposta = Eposta
+        };
+
+        Db.Set<Yolcu>().Add(y);
+        Db.SaveChanges();
+
+        Nav.NavigateTo("/yolcu", forceLoad: true);
+    }
+}

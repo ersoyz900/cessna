@@ -1,0 +1,63 @@
+﻿@page "/hostes/delete/{id:int}"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@using Microsoft.EntityFrameworkCore
+@inject CessnasContext Db
+@inject NavigationManager Nav
+
+<h3>Hostes Sil</h3>
+
+@if (!string.IsNullOrEmpty(Hata))
+{
+    <div class="alert alert-danger">@Hata</div>
+}
+
+@if (Model == null)
+{
+    <p>Yükleniyor...</p>
+}
+else
+{
+    <p>
+        <strong>@Model.AdSoyad</strong> adlı hostesi silmek istiyor musunuz?
+    </p>
+
+    <button class="btn btn-danger" @onclick="Sil">Sil</button>
+    <a class="btn btn-secondary ms-2" href="/hostes">İptal</a>
+}
+
+@code {
+    [Parameter] public int id { get; set; }
+
+    Hoste? Model;
+    string? Hata;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Model = await Db.Set<Hoste>()
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(x => x.HostesKod == id);
+    }
+
+    async Task Sil()
+    {
+        if (Model == null) return;
+
+        try
+        {
+            Db.Attach(Model);
+            Db.Set<Hoste>().Remove(Model);
+            await Db.SaveChangesAsync();
+            Nav.NavigateTo("/hostes", true);
+        }
+        catch (DbUpdateException)
+        {
+            Hata = "Bu hostes uçuşlara bağlı olduğu için silinemiyor.";
+        }
+        catch (Exception ex)
+        {
+            Hata = ex.Message;
+        }
+    }
+}

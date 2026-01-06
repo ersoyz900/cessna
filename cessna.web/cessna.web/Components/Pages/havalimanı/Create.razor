@@ -1,0 +1,69 @@
+﻿@page "/havalimani/create"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@inject CessnasContext Db
+@inject NavigationManager Nav
+
+<h3>Create Airport</h3>
+
+@if (!string.IsNullOrEmpty(Hata))
+{
+    <div class="alert alert-danger">@Hata</div>
+}
+
+<div class="mb-3">
+    <label>IATA Kodu *</label>
+    <input class="form-control" @bind="IATAKodu" />
+</div>
+
+<div class="mb-3">
+    <label>Ad *</label>
+    <input class="form-control" @bind="Ad" />
+</div>
+
+<div class="mb-3">
+    <label>Şehir</label>
+    <input class="form-control" @bind="Sehir" />
+</div>
+
+<div class="mb-3">
+    <label>Ülke</label>
+    <input class="form-control" @bind="Ulke" />
+</div>
+
+<button type="button" class="btn btn-primary" @onclick="Save">Save</button>
+<a class="btn btn-secondary ms-2" href="/havalimani">Cancel</a>
+
+@code {
+    string? IATAKodu;
+    string? Ad;
+    string? Sehir;
+    string? Ulke;
+    string? Hata;
+
+    void Save()
+    {
+        Hata = null;
+
+        if (string.IsNullOrWhiteSpace(IATAKodu) ||
+            string.IsNullOrWhiteSpace(Ad))
+        {
+            Hata = "IATA Kodu ve Ad zorunludur.";
+            return;
+        }
+
+        var h = new Havalimani
+        {
+            IATAKodu = IATAKodu!,
+            Ad = Ad!,
+            Sehir = Sehir,
+            Ulke = Ulke
+        };
+
+        Db.Set<Havalimani>().Add(h);
+        Db.SaveChanges();
+
+        Nav.NavigateTo("/havalimani", forceLoad: true);
+    }
+}

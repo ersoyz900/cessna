@@ -1,0 +1,75 @@
+﻿@page "/ucus/delete/{id:int}"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@using Microsoft.EntityFrameworkCore
+@inject CessnasContext Db
+@inject NavigationManager Nav
+
+<h3>Delete Flight</h3>
+
+@if (!string.IsNullOrEmpty(Hata))
+{
+    <div class="alert alert-danger">
+        @Hata
+    </div>
+}
+
+@if (Ucus == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div class="alert alert-warning">
+        <p>
+            Are you sure you want to delete this flight?
+        </p>
+        <strong>Flight No:</strong> @Ucus.UcusNo
+    </div>
+
+    <button type="button"
+            class="btn btn-danger"
+            @onclick="ConfirmDelete">
+        Yes, Delete
+    </button>
+
+    <a class="btn btn-secondary ms-2" href="/ucus">
+        Cancel
+    </a>
+}
+
+@code {
+    [Parameter] public int id { get; set; }
+
+    Ucu? Ucus;
+    string? Hata;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Ucus = await Db.Ucus.FirstOrDefaultAsync(x => x.UcusKod == id);
+
+        if (Ucus == null)
+        {
+            Hata = "Flight not found.";
+        }
+    }
+
+    async Task ConfirmDelete()
+    {
+        if (Ucus == null)
+            return;
+
+        try
+        {
+            Db.Ucus.Remove(Ucus);
+            await Db.SaveChangesAsync();
+
+            Nav.NavigateTo("/ucus", forceLoad: true);
+        }
+        catch (DbUpdateException)
+        {
+            Hata = "This flight cannot be deleted because it has related records (reservations, fuel, staff, etc.).";
+        }
+    }
+}

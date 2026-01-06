@@ -1,0 +1,52 @@
+﻿@page "/havalimani"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@using Microsoft.EntityFrameworkCore
+@inject CessnasContext Db
+
+<h3>Airports</h3>
+
+<a class="btn btn-success mb-3" href="/havalimani/create">
+    New Airport
+</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>IATA</th>
+            <th>Ad</th>
+            <th>Şehir</th>
+            <th>Ülke</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var h in Havalimanlari)
+        {
+            <tr>
+                <td>@h.IATAKodu</td>
+                <td>@h.Ad</td>
+                <td>@h.Sehir</td>
+                <td>@h.Ulke</td>
+                <td>
+                    <a class="btn btn-sm btn-primary"
+                       href="/havalimani/edit/@h.HavalimaniKod">Edit</a>
+                    <a class="btn btn-sm btn-danger ms-1"
+                       href="/havalimani/delete/@h.HavalimaniKod">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    List<Havalimani> Havalimanlari = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Havalimanlari = await Db.Set<Havalimani>()
+                                .AsNoTracking()
+                                .ToListAsync();
+    }
+}

@@ -1,0 +1,57 @@
+﻿@page "/ucus"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@using Microsoft.EntityFrameworkCore
+@inject CessnasContext Db
+
+<h3>Flights</h3>
+
+<a class="btn btn-success mb-3" href="/ucus/create">
+    New Flight
+</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Flight No</th>
+            <th>Status</th>
+            <th>Departure</th>
+            <th>Arrival</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var u in Ucuslar)
+        {
+            <tr>
+                <td>@u.UcusNo</td>
+                <td>@u.Durum</td>
+                <td>@u.KalkisZamani</td>
+                <td>@u.VarisZamani</td>
+                <td>
+                    <a class="btn btn-sm btn-primary"
+                       href="/ucus/edit/@u.UcusKod">
+                        Edit
+                    </a>
+
+                    <a class="btn btn-sm btn-danger ms-1"
+                       href="/ucus/delete/@u.UcusKod">
+                        Delete
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<Ucu> Ucuslar = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Ucuslar = await Db.Set<Ucu>()
+                          .AsNoTracking()
+                          .ToListAsync();
+    }
+}

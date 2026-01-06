@@ -1,0 +1,172 @@
+﻿@page "/koltuk/create"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@using Microsoft.EntityFrameworkCore
+@inject CessnasContext Db
+@inject NavigationManager Nav
+
+<h3>Create Seat</h3>
+
+@if (!string.IsNullOrEmpty(Hata))
+{
+    <div class="alert alert-danger">@Hata</div>
+}
+
+<!-- UÇAK SEÇ -->
+<div class="mb-3">
+    <label>Uçak Modeli *</label>
+    <select class="form-control" @onchange="OnUcakChanged">
+        <option value="">-- Uçak Seçiniz --</option>
+
+        @foreach (var u in Ucaklar)
+        {
+            <option value="@u.UcakKod">@u.Model</option>
+        }
+    </select>
+</div>
+
+@if (SeciliUcak != null)
+{
+    <div class="alert alert-secondary">
+        <strong>Seçilen Uçak:</strong> @SeciliUcak.Model <br />
+        <strong>Kapasite:</strong> @SeciliUcak.Kapasite koltuk
+    </div>
+
+    <!-- KOLTUK NO (UÇAĞA GÖRE) -->
+    <div class="mb-2">
+        <label>Koltuk No *</label>
+        <select class="form-control" @onchange="OnKoltukChanged">
+            <option value="">-- Koltuk Seçiniz --</option>
+
+            @foreach (var no in UygunKoltuklar)
+            {
+                <option value="@no">@no</option>
+            }
+        </select>
+    </div>
+}
+
+<!-- KOLTUK TİPİ -->
+<div class="mb-2">
+    <label>Koltuk Tipi</label>
+    <select class="form-control" @bind="KoltukTipi">
+        <option value="">-</option>
+        <option>Economy</option>
+        <option>Business</option>
+    </select>
+</div>
+
+<!-- DİZ MESAFESİ -->
+<div class="mb-2">
+    <label>Diz Mesafesi (cm)</label>
+    <input type="number"
+           class="form-control"
+           min="60"
+           max="120"
+           @bind="DizMesafesi" />
+    <small class="text-muted">
+        Diz mesafesi 60–120 cm arasında olmalıdır.
+    </small>
+</div>
+
+<button class="btn btn-primary" @onclick="Save">Save</button>
+<a class="btn btn-secondary ms-2" href="/koltuk">Cancel</a>
+
+@code {
+    // UI
+    string? Hata;
+
+    // FORM
+    int? SeciliUcakKod;
+    Ucak? SeciliUcak;
+
+    string? SeciliKoltukNo;
+    string? KoltukTipi;
+    int? DizMesafesi;
+
+    // DATA
+    List<Ucak> Ucaklar = new();
+    List<string> UygunKoltuklar = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Ucaklar = await Db.Set<Ucak>()
+            .AsNoTracking()
+            .OrderBy(u => u.Model)
+            .ToListAsync();
+    }
+
+    async Task OnUcakChanged(ChangeEventArgs e)
+    {
+        Hata = null;
+        UygunKoltuklar.Clear();
+        SeciliKoltukNo = null;
+
+        if (!int.TryParse(e.Value?.ToString(), out var kod))
+        {
+            SeciliUcak = null;
+            SeciliUcakKod = null;
+            return;
+        }
+
+        SeciliUcakKod = kod;
+
+        SeciliUcak = await Db.Set<Ucak>()
+            .FirstOrDefaultAsync(u => u.UcakKod == SeciliUcakKod);
+
+        if (SeciliUcak == null || SeciliUcak.Kapasite == null)
+            return;
+
+        int kapasite = SeciliUcak.Kapasite.Value;
+
+        var doluKoltuklar = await Db.Set<Koltuk>()
+            .Where(k => k.UcakKod == SeciliUcakKod)
+            .Select(k => k.KoltukNo)
+            .ToListAsync();
+
+        for (int i = 1; i <= kapasite; i++)
+        {
+            string no = i.ToString();
+            if (!doluKoltuklar.Contains(no))
+                UygunKoltuklar.Add(no);
+        }
+    }
+
+    void OnKoltukChanged(ChangeEventArgs e)
+    {
+        SeciliKoltukNo = e.Value?.ToString();
+    }
+
+    async Task Save()
+    {
+        Hata = null;
+
+        if (SeciliUcakKod == null || string.IsNullOrEmpty(SeciliKoltukNo))
+        {
+            Hata = "Uçak ve Koltuk No seçilmelidir.";
+            return;
+        }
+
+        // 🔴 DİZ MESAFESİ BACKEND KISITI (ÇOK ÖNEMLİ)
+        if (DizMesafesi.HasValue &&
+            (DizMesafesi < 60 || DizMesafesi > 120))
+        {
+            Hata = "Diz mesafesi 60–120 cm arasında olmalıdır.";
+            return;
+        }
+
+        var koltuk = new Koltuk
+        {
+            UcakKod = SeciliUcakKod.Value,
+            KoltukNo = SeciliKoltukNo,
+            KoltukTipi = KoltukTipi,
+            DizMesafesi = DizMesafesi
+        };
+
+        Db.Set<Koltuk>().Add(koltuk);
+        await Db.SaveChangesAsync();
+
+        Nav.NavigateTo("/koltuk", forceLoad: true);
+    }
+}

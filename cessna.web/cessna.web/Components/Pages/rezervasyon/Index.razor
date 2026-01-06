@@ -1,0 +1,73 @@
+﻿@page "/rezervasyon"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@using Microsoft.EntityFrameworkCore
+@inject CessnasContext Db
+
+<h3>Rezervasyonlar</h3>
+
+<a class="btn btn-success mb-3" href="/rezervasyon/create">
+    New Reservation
+</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>No</th>
+            <th>Yolcu</th>
+            <th>Uçuş</th>
+            <th>Zaman</th>
+            <th>Sınıf</th>
+            <th>Ödeme</th>
+            <th>Koltuk</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            var i = 1;
+        }
+        @foreach (var r in Rezervasyonlar)
+        {
+            <tr>
+                <td>@i</td>
+                <td>@r.YolcuKodNavigation.AdSoyad</td>
+                <td>@r.UcusKodNavigation.UcusNo</td>
+                <td>
+                    @(r.RezervasyonZamani.HasValue
+                                    ? r.RezervasyonZamani.Value.ToString("yyyy-MM-dd HH:mm")
+                                    : "-")
+            </td>
+            <td>@(r.Sinif ?? "-")</td>
+            <td>@(r.OdemeDurumu ?? "-")</td>
+            <td>@(r.KoltukNo ?? "-")</td>
+            <td>
+                <a class="btn btn-sm btn-primary"
+                   href="/rezervasyon/edit/@r.RezervasyonKod">
+                    Edit
+                </a>
+                <a class="btn btn-sm btn-danger ms-1"
+                   href="/rezervasyon/delete/@r.RezervasyonKod">
+                    Delete
+                </a>
+            </td>
+        </tr>
+                i++;
+        }
+    </tbody>
+</table>
+
+@code {
+
+    List<Rezervasyon> Rezervasyonlar = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Rezervasyonlar = await Db.Set<Rezervasyon>()
+            .Include(r => r.YolcuKodNavigation)
+            .Include(r => r.UcusKodNavigation)
+            .AsNoTracking()
+            .ToListAsync();
+    }
+}

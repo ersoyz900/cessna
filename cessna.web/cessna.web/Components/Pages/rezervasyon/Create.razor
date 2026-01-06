@@ -1,0 +1,205 @@
+﻿@page "/rezervasyon/create"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@using Microsoft.EntityFrameworkCore
+@using System.Globalization
+@inject CessnasContext Db
+@inject NavigationManager Nav
+
+<h3>Create Reservation</h3>
+
+@if (!string.IsNullOrEmpty(Hata))
+{
+    <div class="alert alert-danger">@Hata</div>
+}
+
+<!-- YOLCU -->
+<div class="mb-2">
+    <label>Yolcu</label>
+    <select class="form-control" @onchange="OnYolcuChanged">
+        <option value="">-- Yolcu Seçiniz --</option>
+        @foreach (var y in Yolcular)
+        {
+            <option value="@y.YolcuKod">@y.AdSoyad</option>
+        }
+    </select>
+</div>
+
+<!-- UÇUŞ -->
+<div class="mb-2">
+    <label>Uçuş</label>
+    <select class="form-control" @onchange="OnUcusChanged">
+        <option value="">-- Uçuş Seçiniz --</option>
+        @foreach (var u in Ucuslar)
+        {
+            <option value="@u.UcusKod">@u.UcusNo</option>
+        }
+    </select>
+</div>
+
+<!-- TARİH / SAAT -->
+<div class="mb-2">
+    <label>Rezervasyon Zamanı</label>
+    <input type="datetime-local"
+           class="form-control"
+           @onchange="OnZamanChanged" />
+</div>
+
+<div class="mb-2">
+    <label>Sınıf</label>
+    <select class="form-control" @onchange="e => Sinif = e.Value?.ToString()">
+        <option value="">-</option>
+        <option>Economy</option>
+        <option>Business</option>
+    </select>
+</div>
+
+<div class="mb-2">
+    <label>Ödeme Durumu</label>
+    <select class="form-control" @onchange="e => OdemeDurumu = e.Value?.ToString()">
+        <option value="">-</option>
+        <option>Paid</option>
+        <option>Unpaid</option>
+    </select>
+</div>
+
+<!-- ✅ KOLTUK (DB’DEN) -->
+<div class="mb-2">
+    <label>Koltuk No</label>
+    <select class="form-control" @onchange="OnKoltukChanged" disabled="@(!Koltuklar.Any())">
+        <option value="">-- Koltuk Seçiniz --</option>
+        @foreach (var k in Koltuklar)
+        {
+            <option value="@k.KoltukNo">@k.KoltukNo</option>
+        }
+    </select>
+</div>
+
+<button class="btn btn-primary" @onclick="Save">Save</button>
+<a class="btn btn-secondary ms-2" href="/rezervasyon">Cancel</a>
+
+@code {
+
+    // HATA
+    string? Hata;
+
+    // FK'LER
+    int? YolcuKod;
+    int? UcusKod;
+
+    // ZAMAN
+    string? RezervasyonZamaniStr;
+
+    // DİĞER
+    string? Sinif;
+    string? OdemeDurumu;
+    string? KoltukNo;
+
+    // DROPDOWN DATALARI
+    List<Yolcu> Yolcular = new();
+    List<Ucu> Ucuslar = new();
+    List<Koltuk> Koltuklar = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Yolcular = await Db.Set<Yolcu>()
+            .AsNoTracking()
+            .OrderBy(y => y.AdSoyad)
+            .ToListAsync();
+
+        Ucuslar = await Db.Set<Ucu>()
+            .AsNoTracking()
+            .OrderBy(u => u.UcusNo)
+            .ToListAsync();
+    }
+
+    void OnYolcuChanged(ChangeEventArgs e)
+    {
+        YolcuKod = int.TryParse(e.Value?.ToString(), out var v) ? v : null;
+    }
+
+    async void OnUcusChanged(ChangeEventArgs e)
+    {
+        UcusKod = int.TryParse(e.Value?.ToString(), out var v) ? v : null;
+        Koltuklar.Clear();
+        KoltukNo = null;
+
+        if (UcusKod == null)
+            return;
+
+        var ucus = await Db.Set<Ucu>()
+                           .AsNoTracking()
+                           .FirstOrDefaultAsync(u => u.UcusKod == UcusKod);
+
+        if (ucus?.UcakKod == null)
+            return;
+
+        Koltuklar = await Db.Set<Koltuk>()
+                            .AsNoTracking()
+                            .Where(k => k.UcakKod == ucus.UcakKod)
+                            .OrderBy(k => k.KoltukNo)
+                            .ToListAsync();
+    }
+
+    void OnKoltukChanged(ChangeEventArgs e)
+    {
+        KoltukNo = e.Value?.ToString();
+    }
+
+    void OnZamanChanged(ChangeEventArgs e)
+    {
+        RezervasyonZamaniStr = e.Value?.ToString();
+    }
+
+    async Task Save()
+    {
+        Hata = null;
+
+        if (YolcuKod == null || UcusKod == null)
+        {
+            Hata = "Yolcu ve uçuş seçilmelidir.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(KoltukNo))
+        {
+            Hata = "Koltuk seçilmelidir.";
+            return;
+        }
+
+        DateTime? rezervasyonZamani = null;
+
+        if (!string.IsNullOrWhiteSpace(RezervasyonZamaniStr))
+        {
+            if (!DateTime.TryParseExact(
+                RezervasyonZamaniStr,
+                new[] { "yyyy-MM-ddTHH:mm", "yyyy-MM-ddTHH:mm:ss" },
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out var dt))
+            {
+                Hata = "Rezervasyon zamanı geçersiz.";
+                return;
+            }
+
+            rezervasyonZamani = dt;
+        }
+
+        var rezervasyon = new Rezervasyon
+        {
+            YolcuKod = YolcuKod.Value,
+            UcusKod = UcusKod.Value,
+            RezervasyonZamani = rezervasyonZamani,
+            Sinif = Sinif,
+            OdemeDurumu = OdemeDurumu,
+            KoltukNo = KoltukNo
+        };
+
+        Db.Set<Rezervasyon>().Add(rezervasyon);
+        await Db.SaveChangesAsync();
+
+        Nav.NavigateTo("/rezervasyon", true);
+    }
+}
+

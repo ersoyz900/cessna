@@ -1,0 +1,79 @@
+﻿@page "/hostes/edit/{id:int}"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@using Microsoft.EntityFrameworkCore
+@inject CessnasContext Db
+@inject NavigationManager Nav
+
+<h3>Hostes Düzenle</h3>
+
+@if (!string.IsNullOrEmpty(Hata))
+{
+    <div class="alert alert-danger">@Hata</div>
+}
+
+@if (Model == null)
+{
+    <p>Yükleniyor...</p>
+}
+else
+{
+    <EditForm Model="Model" OnValidSubmit="Kaydet">
+        <div class="mb-3">
+            <label>Ad Soyad *</label>
+            <InputText class="form-control" @bind-Value="Model.AdSoyad" />
+        </div>
+
+        <div class="mb-3">
+            <label>Deneyim (Yıl)</label>
+            <InputNumber class="form-control" @bind-Value="Model.DeneyimYil" />
+        </div>
+
+        <div class="mb-3">
+            <label>Vardiya</label>
+            <InputText class="form-control" @bind-Value="Model.Vardiya" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Kaydet</button>
+        <a class="btn btn-secondary ms-2" href="/hostes">İptal</a>
+    </EditForm>
+}
+
+@code {
+    [Parameter] public int id { get; set; }
+
+    Hoste? Model;
+    string? Hata;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Model = await Db.Set<Hoste>()
+                        .FirstOrDefaultAsync(x => x.HostesKod == id);
+
+        if (Model == null)
+            Hata = "Hostes bulunamadı.";
+    }
+
+    void Kaydet()
+    {
+        if (Model == null) return;
+
+        if (string.IsNullOrWhiteSpace(Model.AdSoyad))
+        {
+            Hata = "Ad Soyad zorunludur.";
+            return;
+        }
+
+        try
+        {
+            Db.SaveChanges();
+            Nav.NavigateTo("/hostes", true);
+        }
+        catch (Exception ex)
+        {
+            Hata = ex.Message;
+        }
+    }
+}
+

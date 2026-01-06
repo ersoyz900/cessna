@@ -1,0 +1,50 @@
+﻿@page "/teknisyen"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@using Microsoft.EntityFrameworkCore
+@inject CessnasContext Db
+
+<h3>Technicians</h3>
+
+<a class="btn btn-success mb-3" href="/teknisyen/create">New Technician</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>No</th>
+            <th>Ad Soyad</th>
+            <th>Görev</th>
+            <th>Vardiya</th>
+            <th>E-posta</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var t in Teknisyenler)
+        {
+            <tr>
+                <td>@t.TeknisyenKod</td>
+                <td>@t.AdSoyad</td>
+                <td>@t.Gorev</td>
+                <td>@t.Vardiya</td>
+                <td>@t.Eposta</td>
+                <td>
+                    <a class="btn btn-sm btn-primary" href="/teknisyen/edit/@t.TeknisyenKod">Edit</a>
+                    <a class="btn btn-sm btn-danger ms-1" href="/teknisyen/delete/@t.TeknisyenKod">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    List<Teknisyen> Teknisyenler = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Teknisyenler = await Db.Set<Teknisyen>()
+                               .AsNoTracking()
+                               .ToListAsync();
+    }
+}

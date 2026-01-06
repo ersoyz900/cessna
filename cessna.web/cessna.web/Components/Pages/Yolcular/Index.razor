@@ -1,0 +1,54 @@
+﻿@page "/yolcu"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@using Microsoft.EntityFrameworkCore
+@inject CessnasContext Db
+
+<h3>Passengers</h3>
+
+<a class="btn btn-success mb-3" href="/yolcu/create">New Passenger</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>No</th>
+            <th>Ad Soyad</th>
+            <th>Cinsiyet</th>
+            <th>Doğum Tarihi</th>
+            <th>Pasaport</th>
+            <th>Telefon</th>
+            <th>E-posta</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var y in Yolcular)
+        {
+            <tr>
+                <td>@y.YolcuKod</td>
+                <td>@y.AdSoyad</td>
+                <td>@y.Cinsiyet</td>
+                <td>@y.DogumTarihi</td>
+                <td>@y.PasaportNo</td>
+                <td>@y.Telefon</td>
+                <td>@y.Eposta</td>
+                <td>
+                    <a class="btn btn-sm btn-primary" href="/yolcu/edit/@y.YolcuKod">Edit</a>
+                    <a class="btn btn-sm btn-danger ms-1" href="/yolcu/delete/@y.YolcuKod">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    List<Yolcu> Yolcular = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Yolcular = await Db.Set<Yolcu>()
+                           .AsNoTracking()
+                           .ToListAsync();
+    }
+}

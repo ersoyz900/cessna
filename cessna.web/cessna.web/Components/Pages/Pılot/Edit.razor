@@ -1,0 +1,70 @@
+﻿@page "/pilot/edit/{id:int}"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@using Microsoft.EntityFrameworkCore
+@inject CessnasContext Db
+@inject NavigationManager Nav
+
+<h3>Edit Pilot</h3>
+
+@if (!string.IsNullOrEmpty(Hata))
+{
+    <div class="alert alert-danger">@Hata</div>
+}
+
+@if (Model == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div class="mb-2">
+        <label>Ad Soyad</label>
+        <input class="form-control" @bind="Model.AdSoyad" />
+    </div>
+
+    <div class="mb-2">
+        <label>Lisans No</label>
+        <input class="form-control" @bind="Model.LisansNo" />
+    </div>
+
+    <div class="mb-2">
+        <label>Deneyim (Yıl)</label>
+        <input type="number" class="form-control" @bind="Model.DeneyimYil" />
+    </div>
+
+    <button type="button" class="btn btn-primary" @onclick="Save">Save</button>
+    <a class="btn btn-secondary ms-2" href="/pilot">Cancel</a>
+}
+
+@code {
+    [Parameter] public int id { get; set; }
+
+    Pilot? Model;
+    string? Hata;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Model = await Db.Set<Pilot>()
+                        .FirstOrDefaultAsync(x => x.PilotKod == id);
+
+        if (Model == null)
+            Hata = "Pilot not found.";
+    }
+
+    void Save()
+    {
+        if (Model == null) return;
+
+        if (string.IsNullOrWhiteSpace(Model.AdSoyad) ||
+            string.IsNullOrWhiteSpace(Model.LisansNo))
+        {
+            Hata = "Ad Soyad and Lisans No are required.";
+            return;
+        }
+
+        Db.SaveChanges();
+        Nav.NavigateTo("/pilot", forceLoad: true);
+    }
+}

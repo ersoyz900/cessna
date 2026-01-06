@@ -1,0 +1,120 @@
+﻿@page "/rezervasyon/edit/{id:int}"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@using Microsoft.EntityFrameworkCore
+@inject CessnasContext Db
+@inject NavigationManager Nav
+
+<h3>Edit Reservation</h3>
+
+@if (!string.IsNullOrEmpty(Hata))
+{
+    <div class="alert alert-danger">@Hata</div>
+}
+
+@if (Model == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div class="mb-2">
+        <label>Yolcu</label>
+        <select class="form-control" @bind="Model.YolcuKod">
+            @foreach (var y in Yolcular)
+            {
+                <option value="@y.YolcuKod">@y.AdSoyad</option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-2">
+        <label>Uçuş</label>
+        <select class="form-control" @bind="Model.UcusKod">
+            @foreach (var u in Ucuslar)
+            {
+                <option value="@u.UcusKod">@u.UcusNo</option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-2">
+        <label>Rezervasyon Zamanı</label>
+        <input type="datetime-local"
+               class="form-control"
+               @bind="RezervasyonZamani"
+               @bind:format="yyyy-MM-ddTHH:mm" />
+    </div>
+
+    <div class="mb-2">
+        <label>Sınıf</label>
+        <select class="form-control" @bind="Model.Sinif">
+            <option>Economy</option>
+            <option>Business</option>
+        </select>
+    </div>
+
+    <div class="mb-2">
+        <label>Ödeme Durumu</label>
+        <select class="form-control" @bind="Model.OdemeDurumu">
+            <option>Paid</option>
+            <option>Unpaid</option>
+        </select>
+    </div>
+
+    <div class="mb-2">
+        <label>Koltuk No</label>
+        <input class="form-control" @bind="Model.KoltukNo" />
+    </div>
+
+    <button class="btn btn-primary" @onclick="Save">Save</button>
+    <a class="btn btn-secondary ms-2" href="/rezervasyon">Cancel</a>
+}
+
+@code {
+
+    [Parameter] public int id { get; set; }
+
+    Rezervasyon? Model;
+    string? Hata;
+
+    // 🔴 SADE VE GÜVENLİ: UI için DateTime
+    DateTime RezervasyonZamani;
+
+    List<Yolcu> Yolcular = new();
+    List<Ucu> Ucuslar = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Model = await Db.Set<Rezervasyon>()
+            .FirstOrDefaultAsync(x => x.RezervasyonKod == id);
+
+        if (Model == null)
+        {
+            Hata = "Record not found.";
+            return;
+        }
+
+        Yolcular = await Db.Set<Yolcu>().AsNoTracking().ToListAsync();
+        Ucuslar = await Db.Set<Ucu>().AsNoTracking().ToListAsync();
+
+        // DB → UI (NET)
+        RezervasyonZamani =
+            Model.RezervasyonZamani ?? DateTime.Now;
+    }
+
+    async Task Save()
+    {
+        if (Model == null) return;
+
+        // UI → DB (NET)
+        Model.RezervasyonZamani = RezervasyonZamani;
+
+        // EF Core tracking garanti
+        Db.Update(Model);
+
+        await Db.SaveChangesAsync();
+        Nav.NavigateTo("/rezervasyon", forceLoad: true);
+    }
+}

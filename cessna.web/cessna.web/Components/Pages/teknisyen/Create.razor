@@ -1,0 +1,72 @@
+﻿@page "/teknisyen/create"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@inject CessnasContext Db
+@inject NavigationManager Nav
+
+<h3>Yeni Teknisyen Ekle</h3>
+
+@if (!string.IsNullOrEmpty(Hata))
+{
+    <div class="alert alert-danger">
+        @Hata
+    </div>
+}
+
+<EditForm Model="Model" OnValidSubmit="Kaydet">
+    <DataAnnotationsValidator />
+
+    <div class="mb-3">
+        <label class="form-label">Ad Soyad *</label>
+        <InputText class="form-control" @bind-Value="Model.AdSoyad" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Görev</label>
+        <InputText class="form-control" @bind-Value="Model.Gorev" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Vardiya</label>
+        <InputText class="form-control" @bind-Value="Model.Vardiya" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">E-posta</label>
+        <InputText class="form-control" @bind-Value="Model.Eposta" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+    <a class="btn btn-secondary ms-2" href="/teknisyen">İptal</a>
+</EditForm>
+
+@code {
+    Teknisyen Model = new();
+
+    string? Hata;
+
+    void Kaydet()
+    {
+        Hata = null;
+
+        if (string.IsNullOrWhiteSpace(Model.AdSoyad))
+        {
+            Hata = "Ad Soyad zorunludur.";
+            return;
+        }
+
+        try
+        {
+            // EDMX / Database-First için DOĞRU KULLANIM
+            Db.Set<Teknisyen>().Add(Model);
+            Db.SaveChanges();
+
+            Nav.NavigateTo("/teknisyen", true);
+        }
+        catch (Exception ex)
+        {
+            Hata = ex.Message;
+        }
+    }
+}

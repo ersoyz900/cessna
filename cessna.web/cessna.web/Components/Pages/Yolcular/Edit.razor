@@ -1,0 +1,80 @@
+﻿@page "/yolcu/edit/{id:int}"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@using Microsoft.EntityFrameworkCore
+@inject CessnasContext Db
+@inject NavigationManager Nav
+
+<h3>Edit Passenger</h3>
+
+@if (!string.IsNullOrEmpty(Hata))
+{
+    <div class="alert alert-danger">@Hata</div>
+}
+
+@if (Model == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div class="mb-2">
+        <label>Ad Soyad</label>
+        <input class="form-control" @bind="Model.AdSoyad" />
+    </div>
+
+    <div class="mb-2">
+        <label>Pasaport No</label>
+        <input class="form-control" @bind="Model.PasaportNo" />
+    </div>
+
+    <div class="mb-2">
+        <label>Cinsiyet</label>
+        <input class="form-control" @bind="Model.Cinsiyet" />
+    </div>
+
+    <div class="mb-2">
+        <label>Doğum Tarihi</label>
+        <input type="date" class="form-control" @bind="Model.DogumTarihi" />
+    </div>
+
+    <div class="mb-2">
+        <label>Telefon</label>
+        <input class="form-control" @bind="Model.Telefon" />
+    </div>
+
+    <div class="mb-2">
+        <label>E-posta</label>
+        <input class="form-control" @bind="Model.Eposta" />
+    </div>
+
+    <button class="btn btn-primary" @onclick="Save">Save</button>
+    <a class="btn btn-secondary ms-2" href="/yolcu">Cancel</a>
+}
+
+@code {
+    [Parameter] public int id { get; set; }
+
+    Yolcu? Model;
+    string? Hata;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Model = await Db.Set<Yolcu>()
+                        .FirstOrDefaultAsync(x => x.YolcuKod == id);
+
+        if (Model == null)
+            Hata = "Passenger not found.";
+    }
+
+    void Save()
+    {
+        if (Model == null) return;
+
+        Db.SaveChanges();
+        Nav.NavigateTo("/yolcu", forceLoad: true);
+    }
+}
+
+}

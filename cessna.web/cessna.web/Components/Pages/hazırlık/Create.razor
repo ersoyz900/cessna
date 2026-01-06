@@ -1,0 +1,122 @@
+﻿@page "/hazirlikkontrol/create"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@using Microsoft.EntityFrameworkCore
+@inject CessnasContext Db
+@inject NavigationManager Nav
+
+<h3>Create Inspection</h3>
+
+@if (!string.IsNullOrEmpty(Hata))
+{
+    <div class="alert alert-danger">@Hata</div>
+}
+
+<div class="mb-3">
+    <label>Technician</label>
+    <select class="form-select" @bind="TeknisyenKod">
+        <option value="">Select technician</option>
+        @foreach (var t in Teknisyenler)
+        {
+            <option value="@t.TeknisyenKod">@t.AdSoyad</option>
+        }
+    </select>
+</div>
+
+<div class="mb-3">
+    <label>Aircraft</label>
+    <select class="form-select" @bind="UcakKod">
+        <option value="">Select aircraft</option>
+        @foreach (var u in Ucaklar)
+        {
+            <option value="@u.UcakKod">@u.Model (@u.KuyrukNo)</option>
+        }
+    </select>
+</div>
+
+<div class="mb-3">
+    <label>Flight</label>
+    <select class="form-select" @bind="UcusKod">
+        <option value="">Select flight</option>
+        @foreach (var f in Ucuslar)
+        {
+            <option value="@f.UcusKod">@f.UcusNo</option>
+        }
+    </select>
+</div>
+
+<div class="mb-3">
+    <label>Preparation Time</label>
+    <input type="datetime-local"
+           class="form-control"
+           @bind="HazirlikZamani"
+           @bind:format="yyyy-MM-ddTHH:mm" />
+</div>
+
+<div class="mb-3">
+    <label>Notes</label>
+    <textarea class="form-control" rows="3" @bind="Notlar"></textarea>
+</div>
+
+<button class="btn btn-primary" @onclick="Save">Save</button>
+<a class="btn btn-secondary ms-2" href="/hazirlikkontrol">Cancel</a>
+
+@code {
+    int? TeknisyenKod;
+    int? UcakKod;
+    int? UcusKod;
+
+    // 🔑 NULL DEĞİL → ZAMAN SEÇİLEBİLİR
+    DateTime HazirlikZamani = DateTime.Now;
+
+    string? Notlar;
+    string? Hata;
+
+    List<Teknisyen> Teknisyenler = new();
+    List<Ucak> Ucaklar = new();
+    List<Ucu> Ucuslar = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Teknisyenler = await Db.Set<Teknisyen>().AsNoTracking().ToListAsync();
+        Ucaklar = await Db.Set<Ucak>().AsNoTracking().ToListAsync();
+        Ucuslar = await Db.Set<Ucu>().AsNoTracking().ToListAsync();
+    }
+
+    async Task Save()
+    {
+        Hata = null;
+
+        if (TeknisyenKod == null || UcakKod == null || UcusKod == null)
+        {
+            Hata = "Technician, Aircraft and Flight are required.";
+            return;
+        }
+
+        bool exists = await Db.Set<HazirlikKontrol>().AnyAsync(x =>
+            x.TeknisyenKod == TeknisyenKod &&
+            x.UcakKod == UcakKod &&
+            x.UcusKod == UcusKod);
+
+        if (exists)
+        {
+            Hata = "This inspection already exists.";
+            return;
+        }
+
+        var hk = new HazirlikKontrol
+        {
+            TeknisyenKod = TeknisyenKod.Value,
+            UcakKod = UcakKod.Value,
+            UcusKod = UcusKod.Value,
+            HazirlikZamani = HazirlikZamani,
+            Notlar = Notlar
+        };
+
+        Db.Add(hk);
+        await Db.SaveChangesAsync();
+
+        Nav.NavigateTo("/hazirlikkontrol", true);
+    }
+}

@@ -1,0 +1,925 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="cessnasModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Havalimani">
+          <Key>
+            <PropertyRef Name="HavalimaniKod" />
+          </Key>
+          <Property Name="HavalimaniKod" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IATAKodu" Type="varchar" MaxLength="3" Nullable="false" />
+          <Property Name="Ad" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="Sehir" Type="varchar" MaxLength="30" />
+          <Property Name="Ulke" Type="varchar" MaxLength="30" />
+        </EntityType>
+        <EntityType Name="HazirlikKontrol">
+          <Key>
+            <PropertyRef Name="TeknisyenKod" />
+            <PropertyRef Name="UcakKod" />
+            <PropertyRef Name="UcusKod" />
+          </Key>
+          <Property Name="TeknisyenKod" Type="int" Nullable="false" />
+          <Property Name="UcakKod" Type="int" Nullable="false" />
+          <Property Name="UcusKod" Type="int" Nullable="false" />
+          <Property Name="HazirlikZamani" Type="datetime2" Precision="7" />
+          <Property Name="Notlar" Type="varchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="Hostes">
+          <Key>
+            <PropertyRef Name="HostesKod" />
+          </Key>
+          <Property Name="HostesKod" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="AdSoyad" Type="varchar" MaxLength="40" Nullable="false" />
+          <Property Name="DeneyimYil" Type="int" />
+          <Property Name="Vardiya" Type="varchar" MaxLength="15" />
+        </EntityType>
+        <EntityType Name="Koltuk">
+          <Key>
+            <PropertyRef Name="UcakKod" />
+            <PropertyRef Name="KoltukNo" />
+          </Key>
+          <Property Name="UcakKod" Type="int" Nullable="false" />
+          <Property Name="KoltukNo" Type="varchar" MaxLength="5" Nullable="false" />
+          <Property Name="KoltukTipi" Type="varchar" MaxLength="20" />
+          <Property Name="DizMesafesi" Type="int" />
+        </EntityType>
+        <EntityType Name="Pilot">
+          <Key>
+            <PropertyRef Name="PilotKod" />
+          </Key>
+          <Property Name="PilotKod" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="AdSoyad" Type="varchar" MaxLength="40" Nullable="false" />
+          <Property Name="LisansNo" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="DeneyimYil" Type="int" />
+        </EntityType>
+        <EntityType Name="Rezervasyon">
+          <Key>
+            <PropertyRef Name="RezervasyonKod" />
+          </Key>
+          <Property Name="RezervasyonKod" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="YolcuKod" Type="int" Nullable="false" />
+          <Property Name="UcusKod" Type="int" Nullable="false" />
+          <Property Name="RezervasyonZamani" Type="datetime2" Precision="7" />
+          <Property Name="Sinif" Type="varchar" MaxLength="10" />
+          <Property Name="OdemeDurumu" Type="varchar" MaxLength="15" />
+          <Property Name="KoltukNo" Type="varchar" MaxLength="5" />
+        </EntityType>
+        <EntityType Name="Teknisyen">
+          <Key>
+            <PropertyRef Name="TeknisyenKod" />
+          </Key>
+          <Property Name="TeknisyenKod" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="AdSoyad" Type="varchar" MaxLength="40" Nullable="false" />
+          <Property Name="Gorev" Type="varchar" MaxLength="25" />
+          <Property Name="Vardiya" Type="varchar" MaxLength="15" />
+          <Property Name="Eposta" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="Ucak">
+          <Key>
+            <PropertyRef Name="UcakKod" />
+          </Key>
+          <Property Name="UcakKod" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="KuyrukNo" Type="varchar" MaxLength="10" Nullable="false" />
+          <Property Name="Model" Type="varchar" MaxLength="30" Nullable="false" />
+          <Property Name="Uretici" Type="varchar" MaxLength="30" />
+          <Property Name="Kapasite" Type="int" />
+          <Property Name="UretimYili" Type="int" />
+        </EntityType>
+        <EntityType Name="Ucus">
+          <Key>
+            <PropertyRef Name="UcusKod" />
+          </Key>
+          <Property Name="UcusKod" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="UcusNo" Type="varchar" MaxLength="10" Nullable="false" />
+          <Property Name="KalkisZamani" Type="datetime2" Precision="7" />
+          <Property Name="VarisZamani" Type="datetime2" Precision="7" />
+          <Property Name="Durum" Type="varchar" MaxLength="15" />
+          <Property Name="UcakKod" Type="int" />
+          <Property Name="PilotKod" Type="int" />
+          <Property Name="KalkisHavalimaniKod" Type="int" />
+          <Property Name="VarisHavalimaniKod" Type="int" />
+        </EntityType>
+        <EntityType Name="UcusHostes">
+          <Key>
+            <PropertyRef Name="UcusKod" />
+            <PropertyRef Name="HostesKod" />
+          </Key>
+          <Property Name="UcusKod" Type="int" Nullable="false" />
+          <Property Name="HostesKod" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Yakit">
+          <Key>
+            <PropertyRef Name="YakitKod" />
+          </Key>
+          <Property Name="YakitKod" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="UcusKod" Type="int" Nullable="false" />
+          <Property Name="TeknisyenKod" Type="int" Nullable="false" />
+          <Property Name="MiktarLitre" Type="float" />
+          <Property Name="BirimFiyat" Type="float" />
+          <Property Name="ToplamTutar" Type="float" StoreGeneratedPattern="Computed" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Yolcu">
+          <Key>
+            <PropertyRef Name="YolcuKod" />
+          </Key>
+          <Property Name="YolcuKod" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="AdSoyad" Type="varchar" MaxLength="40" Nullable="false" />
+          <Property Name="Cinsiyet" Type="varchar" MaxLength="10" />
+          <Property Name="DogumTarihi" Type="date" />
+          <Property Name="Eposta" Type="varchar" MaxLength="50" />
+          <Property Name="Telefon" Type="varchar" MaxLength="15" />
+          <Property Name="PasaportNo" Type="varchar" MaxLength="20" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_HK_Teknisyen">
+          <End Role="Teknisyen" Type="Self.Teknisyen" Multiplicity="1" />
+          <End Role="HazirlikKontrol" Type="Self.HazirlikKontrol" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Teknisyen">
+              <PropertyRef Name="TeknisyenKod" />
+            </Principal>
+            <Dependent Role="HazirlikKontrol">
+              <PropertyRef Name="TeknisyenKod" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_HK_Ucak">
+          <End Role="Ucak" Type="Self.Ucak" Multiplicity="1" />
+          <End Role="HazirlikKontrol" Type="Self.HazirlikKontrol" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Ucak">
+              <PropertyRef Name="UcakKod" />
+            </Principal>
+            <Dependent Role="HazirlikKontrol">
+              <PropertyRef Name="UcakKod" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_HK_Ucus">
+          <End Role="Ucus" Type="Self.Ucus" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="HazirlikKontrol" Type="Self.HazirlikKontrol" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Ucus">
+              <PropertyRef Name="UcusKod" />
+            </Principal>
+            <Dependent Role="HazirlikKontrol">
+              <PropertyRef Name="UcusKod" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Koltuk_Ucak">
+          <End Role="Ucak" Type="Self.Ucak" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Koltuk" Type="Self.Koltuk" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Ucak">
+              <PropertyRef Name="UcakKod" />
+            </Principal>
+            <Dependent Role="Koltuk">
+              <PropertyRef Name="UcakKod" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Rezervasyon_Ucus">
+          <End Role="Ucus" Type="Self.Ucus" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Rezervasyon" Type="Self.Rezervasyon" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Ucus">
+              <PropertyRef Name="UcusKod" />
+            </Principal>
+            <Dependent Role="Rezervasyon">
+              <PropertyRef Name="UcusKod" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Rezervasyon_Yolcu">
+          <End Role="Yolcu" Type="Self.Yolcu" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Rezervasyon" Type="Self.Rezervasyon" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Yolcu">
+              <PropertyRef Name="YolcuKod" />
+            </Principal>
+            <Dependent Role="Rezervasyon">
+              <PropertyRef Name="YolcuKod" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Ucus_KalkisHavalimani">
+          <End Role="Havalimani" Type="Self.Havalimani" Multiplicity="0..1" />
+          <End Role="Ucus" Type="Self.Ucus" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Havalimani">
+              <PropertyRef Name="HavalimaniKod" />
+            </Principal>
+            <Dependent Role="Ucus">
+              <PropertyRef Name="KalkisHavalimaniKod" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Ucus_Pilot">
+          <End Role="Pilot" Type="Self.Pilot" Multiplicity="0..1" />
+          <End Role="Ucus" Type="Self.Ucus" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Pilot">
+              <PropertyRef Name="PilotKod" />
+            </Principal>
+            <Dependent Role="Ucus">
+              <PropertyRef Name="PilotKod" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Ucus_Ucak">
+          <End Role="Ucak" Type="Self.Ucak" Multiplicity="0..1" />
+          <End Role="Ucus" Type="Self.Ucus" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Ucak">
+              <PropertyRef Name="UcakKod" />
+            </Principal>
+            <Dependent Role="Ucus">
+              <PropertyRef Name="UcakKod" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Ucus_VarisHavalimani">
+          <End Role="Havalimani" Type="Self.Havalimani" Multiplicity="0..1" />
+          <End Role="Ucus" Type="Self.Ucus" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Havalimani">
+              <PropertyRef Name="HavalimaniKod" />
+            </Principal>
+            <Dependent Role="Ucus">
+              <PropertyRef Name="VarisHavalimaniKod" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UcusHostes_Hostes">
+          <End Role="Hostes" Type="Self.Hostes" Multiplicity="1" />
+          <End Role="UcusHostes" Type="Self.UcusHostes" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Hostes">
+              <PropertyRef Name="HostesKod" />
+            </Principal>
+            <Dependent Role="UcusHostes">
+              <PropertyRef Name="HostesKod" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UcusHostes_Ucus">
+          <End Role="Ucus" Type="Self.Ucus" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="UcusHostes" Type="Self.UcusHostes" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Ucus">
+              <PropertyRef Name="UcusKod" />
+            </Principal>
+            <Dependent Role="UcusHostes">
+              <PropertyRef Name="UcusKod" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Yakit_Teknisyen">
+          <End Role="Teknisyen" Type="Self.Teknisyen" Multiplicity="1" />
+          <End Role="Yakit" Type="Self.Yakit" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Teknisyen">
+              <PropertyRef Name="TeknisyenKod" />
+            </Principal>
+            <Dependent Role="Yakit">
+              <PropertyRef Name="TeknisyenKod" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Yakit_Ucus">
+          <End Role="Ucus" Type="Self.Ucus" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Yakit" Type="Self.Yakit" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Ucus">
+              <PropertyRef Name="UcusKod" />
+            </Principal>
+            <Dependent Role="Yakit">
+              <PropertyRef Name="UcusKod" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="cessnasModelStoreContainer">
+          <EntitySet Name="Havalimani" EntityType="Self.Havalimani" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="HazirlikKontrol" EntityType="Self.HazirlikKontrol" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Hostes" EntityType="Self.Hostes" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Koltuk" EntityType="Self.Koltuk" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Pilot" EntityType="Self.Pilot" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Rezervasyon" EntityType="Self.Rezervasyon" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Teknisyen" EntityType="Self.Teknisyen" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Ucak" EntityType="Self.Ucak" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Ucus" EntityType="Self.Ucus" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="UcusHostes" EntityType="Self.UcusHostes" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Yakit" EntityType="Self.Yakit" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Yolcu" EntityType="Self.Yolcu" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_HK_Teknisyen" Association="Self.FK_HK_Teknisyen">
+            <End Role="Teknisyen" EntitySet="Teknisyen" />
+            <End Role="HazirlikKontrol" EntitySet="HazirlikKontrol" />
+          </AssociationSet>
+          <AssociationSet Name="FK_HK_Ucak" Association="Self.FK_HK_Ucak">
+            <End Role="Ucak" EntitySet="Ucak" />
+            <End Role="HazirlikKontrol" EntitySet="HazirlikKontrol" />
+          </AssociationSet>
+          <AssociationSet Name="FK_HK_Ucus" Association="Self.FK_HK_Ucus">
+            <End Role="Ucus" EntitySet="Ucus" />
+            <End Role="HazirlikKontrol" EntitySet="HazirlikKontrol" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Koltuk_Ucak" Association="Self.FK_Koltuk_Ucak">
+            <End Role="Ucak" EntitySet="Ucak" />
+            <End Role="Koltuk" EntitySet="Koltuk" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Rezervasyon_Ucus" Association="Self.FK_Rezervasyon_Ucus">
+            <End Role="Ucus" EntitySet="Ucus" />
+            <End Role="Rezervasyon" EntitySet="Rezervasyon" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Rezervasyon_Yolcu" Association="Self.FK_Rezervasyon_Yolcu">
+            <End Role="Yolcu" EntitySet="Yolcu" />
+            <End Role="Rezervasyon" EntitySet="Rezervasyon" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Ucus_KalkisHavalimani" Association="Self.FK_Ucus_KalkisHavalimani">
+            <End Role="Havalimani" EntitySet="Havalimani" />
+            <End Role="Ucus" EntitySet="Ucus" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Ucus_Pilot" Association="Self.FK_Ucus_Pilot">
+            <End Role="Pilot" EntitySet="Pilot" />
+            <End Role="Ucus" EntitySet="Ucus" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Ucus_Ucak" Association="Self.FK_Ucus_Ucak">
+            <End Role="Ucak" EntitySet="Ucak" />
+            <End Role="Ucus" EntitySet="Ucus" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Ucus_VarisHavalimani" Association="Self.FK_Ucus_VarisHavalimani">
+            <End Role="Havalimani" EntitySet="Havalimani" />
+            <End Role="Ucus" EntitySet="Ucus" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UcusHostes_Hostes" Association="Self.FK_UcusHostes_Hostes">
+            <End Role="Hostes" EntitySet="Hostes" />
+            <End Role="UcusHostes" EntitySet="UcusHostes" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UcusHostes_Ucus" Association="Self.FK_UcusHostes_Ucus">
+            <End Role="Ucus" EntitySet="Ucus" />
+            <End Role="UcusHostes" EntitySet="UcusHostes" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Yakit_Teknisyen" Association="Self.FK_Yakit_Teknisyen">
+            <End Role="Teknisyen" EntitySet="Teknisyen" />
+            <End Role="Yakit" EntitySet="Yakit" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Yakit_Ucus" Association="Self.FK_Yakit_Ucus">
+            <End Role="Ucus" EntitySet="Ucus" />
+            <End Role="Yakit" EntitySet="Yakit" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="cessnasModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Havalimani">
+          <Key>
+            <PropertyRef Name="HavalimaniKod" />
+          </Key>
+          <Property Name="HavalimaniKod" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IATAKodu" Type="String" MaxLength="3" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Ad" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Sehir" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="Ulke" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Ucus" Relationship="Self.FK_Ucus_KalkisHavalimani" FromRole="Havalimani" ToRole="Ucus" />
+          <NavigationProperty Name="Ucus1" Relationship="Self.FK_Ucus_VarisHavalimani" FromRole="Havalimani" ToRole="Ucus" />
+        </EntityType>
+        <EntityType Name="HazirlikKontrol">
+          <Key>
+            <PropertyRef Name="TeknisyenKod" />
+            <PropertyRef Name="UcakKod" />
+            <PropertyRef Name="UcusKod" />
+          </Key>
+          <Property Name="TeknisyenKod" Type="Int32" Nullable="false" />
+          <Property Name="UcakKod" Type="Int32" Nullable="false" />
+          <Property Name="UcusKod" Type="Int32" Nullable="false" />
+          <Property Name="HazirlikZamani" Type="DateTime" Precision="7" />
+          <Property Name="Notlar" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Teknisyen" Relationship="Self.FK_HK_Teknisyen" FromRole="HazirlikKontrol" ToRole="Teknisyen" />
+          <NavigationProperty Name="Ucak" Relationship="Self.FK_HK_Ucak" FromRole="HazirlikKontrol" ToRole="Ucak" />
+          <NavigationProperty Name="Ucu" Relationship="Self.FK_HK_Ucus" FromRole="HazirlikKontrol" ToRole="Ucus" />
+        </EntityType>
+        <EntityType Name="Hoste">
+          <Key>
+            <PropertyRef Name="HostesKod" />
+          </Key>
+          <Property Name="HostesKod" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AdSoyad" Type="String" MaxLength="40" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="DeneyimYil" Type="Int32" />
+          <Property Name="Vardiya" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Ucus" Relationship="Self.UcusHostes" FromRole="Hostes" ToRole="Ucus" />
+        </EntityType>
+        <EntityType Name="Koltuk">
+          <Key>
+            <PropertyRef Name="UcakKod" />
+            <PropertyRef Name="KoltukNo" />
+          </Key>
+          <Property Name="UcakKod" Type="Int32" Nullable="false" />
+          <Property Name="KoltukNo" Type="String" MaxLength="5" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="KoltukTipi" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="DizMesafesi" Type="Int32" />
+          <NavigationProperty Name="Ucak" Relationship="Self.FK_Koltuk_Ucak" FromRole="Koltuk" ToRole="Ucak" />
+        </EntityType>
+        <EntityType Name="Pilot">
+          <Key>
+            <PropertyRef Name="PilotKod" />
+          </Key>
+          <Property Name="PilotKod" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AdSoyad" Type="String" MaxLength="40" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="LisansNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="DeneyimYil" Type="Int32" />
+          <NavigationProperty Name="Ucus" Relationship="Self.FK_Ucus_Pilot" FromRole="Pilot" ToRole="Ucus" />
+        </EntityType>
+        <EntityType Name="Rezervasyon">
+          <Key>
+            <PropertyRef Name="RezervasyonKod" />
+          </Key>
+          <Property Name="RezervasyonKod" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="YolcuKod" Type="Int32" Nullable="false" />
+          <Property Name="UcusKod" Type="Int32" Nullable="false" />
+          <Property Name="RezervasyonZamani" Type="DateTime" Precision="7" />
+          <Property Name="Sinif" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="OdemeDurumu" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="KoltukNo" Type="String" MaxLength="5" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Ucu" Relationship="Self.FK_Rezervasyon_Ucus" FromRole="Rezervasyon" ToRole="Ucus" />
+          <NavigationProperty Name="Yolcu" Relationship="Self.FK_Rezervasyon_Yolcu" FromRole="Rezervasyon" ToRole="Yolcu" />
+        </EntityType>
+        <EntityType Name="Teknisyen">
+          <Key>
+            <PropertyRef Name="TeknisyenKod" />
+          </Key>
+          <Property Name="TeknisyenKod" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AdSoyad" Type="String" MaxLength="40" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Gorev" Type="String" MaxLength="25" FixedLength="false" Unicode="false" />
+          <Property Name="Vardiya" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="Eposta" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="HazirlikKontrols" Relationship="Self.FK_HK_Teknisyen" FromRole="Teknisyen" ToRole="HazirlikKontrol" />
+          <NavigationProperty Name="Yakits" Relationship="Self.FK_Yakit_Teknisyen" FromRole="Teknisyen" ToRole="Yakit" />
+        </EntityType>
+        <EntityType Name="Ucak">
+          <Key>
+            <PropertyRef Name="UcakKod" />
+          </Key>
+          <Property Name="UcakKod" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="KuyrukNo" Type="String" MaxLength="10" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Model" Type="String" MaxLength="30" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Uretici" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="Kapasite" Type="Int32" />
+          <Property Name="UretimYili" Type="Int32" />
+          <NavigationProperty Name="HazirlikKontrols" Relationship="Self.FK_HK_Ucak" FromRole="Ucak" ToRole="HazirlikKontrol" />
+          <NavigationProperty Name="Koltuks" Relationship="Self.FK_Koltuk_Ucak" FromRole="Ucak" ToRole="Koltuk" />
+          <NavigationProperty Name="Ucus" Relationship="Self.FK_Ucus_Ucak" FromRole="Ucak" ToRole="Ucus" />
+        </EntityType>
+        <EntityType Name="Ucu">
+          <Key>
+            <PropertyRef Name="UcusKod" />
+          </Key>
+          <Property Name="UcusKod" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="UcusNo" Type="String" MaxLength="10" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="KalkisZamani" Type="DateTime" Precision="7" />
+          <Property Name="VarisZamani" Type="DateTime" Precision="7" />
+          <Property Name="Durum" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="UcakKod" Type="Int32" />
+          <Property Name="PilotKod" Type="Int32" />
+          <Property Name="KalkisHavalimaniKod" Type="Int32" />
+          <Property Name="VarisHavalimaniKod" Type="Int32" />
+          <NavigationProperty Name="Havalimani" Relationship="Self.FK_Ucus_KalkisHavalimani" FromRole="Ucus" ToRole="Havalimani" />
+          <NavigationProperty Name="Havalimani1" Relationship="Self.FK_Ucus_VarisHavalimani" FromRole="Ucus" ToRole="Havalimani" />
+          <NavigationProperty Name="HazirlikKontrols" Relationship="Self.FK_HK_Ucus" FromRole="Ucus" ToRole="HazirlikKontrol" />
+          <NavigationProperty Name="Pilot" Relationship="Self.FK_Ucus_Pilot" FromRole="Ucus" ToRole="Pilot" />
+          <NavigationProperty Name="Rezervasyons" Relationship="Self.FK_Rezervasyon_Ucus" FromRole="Ucus" ToRole="Rezervasyon" />
+          <NavigationProperty Name="Ucak" Relationship="Self.FK_Ucus_Ucak" FromRole="Ucus" ToRole="Ucak" />
+          <NavigationProperty Name="Yakits" Relationship="Self.FK_Yakit_Ucus" FromRole="Ucus" ToRole="Yakit" />
+          <NavigationProperty Name="Hostes" Relationship="Self.UcusHostes" FromRole="Ucus" ToRole="Hostes" />
+        </EntityType>
+        <EntityType Name="Yakit">
+          <Key>
+            <PropertyRef Name="YakitKod" />
+          </Key>
+          <Property Name="YakitKod" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="UcusKod" Type="Int32" Nullable="false" />
+          <Property Name="TeknisyenKod" Type="Int32" Nullable="false" />
+          <Property Name="MiktarLitre" Type="Double" />
+          <Property Name="BirimFiyat" Type="Double" />
+          <Property Name="ToplamTutar" Type="Double" Nullable="false" annotation:StoreGeneratedPattern="Computed" />
+          <NavigationProperty Name="Teknisyen" Relationship="Self.FK_Yakit_Teknisyen" FromRole="Yakit" ToRole="Teknisyen" />
+          <NavigationProperty Name="Ucu" Relationship="Self.FK_Yakit_Ucus" FromRole="Yakit" ToRole="Ucus" />
+        </EntityType>
+        <EntityType Name="Yolcu">
+          <Key>
+            <PropertyRef Name="YolcuKod" />
+          </Key>
+          <Property Name="YolcuKod" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AdSoyad" Type="String" MaxLength="40" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Cinsiyet" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="DogumTarihi" Type="DateTime" Precision="0" />
+          <Property Name="Eposta" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Telefon" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="PasaportNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
+          <NavigationProperty Name="Rezervasyons" Relationship="Self.FK_Rezervasyon_Yolcu" FromRole="Yolcu" ToRole="Rezervasyon" />
+        </EntityType>
+        <Association Name="FK_Ucus_KalkisHavalimani">
+          <End Role="Havalimani" Type="Self.Havalimani" Multiplicity="0..1" />
+          <End Role="Ucus" Type="Self.Ucu" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Havalimani">
+              <PropertyRef Name="HavalimaniKod" />
+            </Principal>
+            <Dependent Role="Ucus">
+              <PropertyRef Name="KalkisHavalimaniKod" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Ucus_VarisHavalimani">
+          <End Role="Havalimani" Type="Self.Havalimani" Multiplicity="0..1" />
+          <End Role="Ucus" Type="Self.Ucu" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Havalimani">
+              <PropertyRef Name="HavalimaniKod" />
+            </Principal>
+            <Dependent Role="Ucus">
+              <PropertyRef Name="VarisHavalimaniKod" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_HK_Teknisyen">
+          <End Role="Teknisyen" Type="Self.Teknisyen" Multiplicity="1" />
+          <End Role="HazirlikKontrol" Type="Self.HazirlikKontrol" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Teknisyen">
+              <PropertyRef Name="TeknisyenKod" />
+            </Principal>
+            <Dependent Role="HazirlikKontrol">
+              <PropertyRef Name="TeknisyenKod" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_HK_Ucak">
+          <End Role="Ucak" Type="Self.Ucak" Multiplicity="1" />
+          <End Role="HazirlikKontrol" Type="Self.HazirlikKontrol" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Ucak">
+              <PropertyRef Name="UcakKod" />
+            </Principal>
+            <Dependent Role="HazirlikKontrol">
+              <PropertyRef Name="UcakKod" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_HK_Ucus">
+          <End Role="Ucus" Type="Self.Ucu" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="HazirlikKontrol" Type="Self.HazirlikKontrol" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Ucus">
+              <PropertyRef Name="UcusKod" />
+            </Principal>
+            <Dependent Role="HazirlikKontrol">
+              <PropertyRef Name="UcusKod" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Koltuk_Ucak">
+          <End Role="Ucak" Type="Self.Ucak" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Koltuk" Type="Self.Koltuk" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Ucak">
+              <PropertyRef Name="UcakKod" />
+            </Principal>
+            <Dependent Role="Koltuk">
+              <PropertyRef Name="UcakKod" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Ucus_Pilot">
+          <End Role="Pilot" Type="Self.Pilot" Multiplicity="0..1" />
+          <End Role="Ucus" Type="Self.Ucu" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Pilot">
+              <PropertyRef Name="PilotKod" />
+            </Principal>
+            <Dependent Role="Ucus">
+              <PropertyRef Name="PilotKod" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Rezervasyon_Ucus">
+          <End Role="Ucus" Type="Self.Ucu" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Rezervasyon" Type="Self.Rezervasyon" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Ucus">
+              <PropertyRef Name="UcusKod" />
+            </Principal>
+            <Dependent Role="Rezervasyon">
+              <PropertyRef Name="UcusKod" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Rezervasyon_Yolcu">
+          <End Role="Yolcu" Type="Self.Yolcu" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Rezervasyon" Type="Self.Rezervasyon" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Yolcu">
+              <PropertyRef Name="YolcuKod" />
+            </Principal>
+            <Dependent Role="Rezervasyon">
+              <PropertyRef Name="YolcuKod" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Yakit_Teknisyen">
+          <End Role="Teknisyen" Type="Self.Teknisyen" Multiplicity="1" />
+          <End Role="Yakit" Type="Self.Yakit" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Teknisyen">
+              <PropertyRef Name="TeknisyenKod" />
+            </Principal>
+            <Dependent Role="Yakit">
+              <PropertyRef Name="TeknisyenKod" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Ucus_Ucak">
+          <End Role="Ucak" Type="Self.Ucak" Multiplicity="0..1" />
+          <End Role="Ucus" Type="Self.Ucu" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Ucak">
+              <PropertyRef Name="UcakKod" />
+            </Principal>
+            <Dependent Role="Ucus">
+              <PropertyRef Name="UcakKod" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Yakit_Ucus">
+          <End Role="Ucus" Type="Self.Ucu" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Yakit" Type="Self.Yakit" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Ucus">
+              <PropertyRef Name="UcusKod" />
+            </Principal>
+            <Dependent Role="Yakit">
+              <PropertyRef Name="UcusKod" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="UcusHostes">
+          <End Role="Hostes" Type="Self.Hoste" Multiplicity="*" />
+          <End Role="Ucus" Type="Self.Ucu" Multiplicity="*" />
+        </Association>
+        <EntityContainer Name="cessnasEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Havalimanis" EntityType="Self.Havalimani" />
+          <EntitySet Name="HazirlikKontrols" EntityType="Self.HazirlikKontrol" />
+          <EntitySet Name="Hostes" EntityType="Self.Hoste" />
+          <EntitySet Name="Koltuks" EntityType="Self.Koltuk" />
+          <EntitySet Name="Pilots" EntityType="Self.Pilot" />
+          <EntitySet Name="Rezervasyons" EntityType="Self.Rezervasyon" />
+          <EntitySet Name="Teknisyens" EntityType="Self.Teknisyen" />
+          <EntitySet Name="Ucaks" EntityType="Self.Ucak" />
+          <EntitySet Name="Ucus" EntityType="Self.Ucu" />
+          <EntitySet Name="Yakits" EntityType="Self.Yakit" />
+          <EntitySet Name="Yolcus" EntityType="Self.Yolcu" />
+          <AssociationSet Name="FK_Ucus_KalkisHavalimani" Association="Self.FK_Ucus_KalkisHavalimani">
+            <End Role="Havalimani" EntitySet="Havalimanis" />
+            <End Role="Ucus" EntitySet="Ucus" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Ucus_VarisHavalimani" Association="Self.FK_Ucus_VarisHavalimani">
+            <End Role="Havalimani" EntitySet="Havalimanis" />
+            <End Role="Ucus" EntitySet="Ucus" />
+          </AssociationSet>
+          <AssociationSet Name="FK_HK_Teknisyen" Association="Self.FK_HK_Teknisyen">
+            <End Role="Teknisyen" EntitySet="Teknisyens" />
+            <End Role="HazirlikKontrol" EntitySet="HazirlikKontrols" />
+          </AssociationSet>
+          <AssociationSet Name="FK_HK_Ucak" Association="Self.FK_HK_Ucak">
+            <End Role="Ucak" EntitySet="Ucaks" />
+            <End Role="HazirlikKontrol" EntitySet="HazirlikKontrols" />
+          </AssociationSet>
+          <AssociationSet Name="FK_HK_Ucus" Association="Self.FK_HK_Ucus">
+            <End Role="Ucus" EntitySet="Ucus" />
+            <End Role="HazirlikKontrol" EntitySet="HazirlikKontrols" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Koltuk_Ucak" Association="Self.FK_Koltuk_Ucak">
+            <End Role="Ucak" EntitySet="Ucaks" />
+            <End Role="Koltuk" EntitySet="Koltuks" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Ucus_Pilot" Association="Self.FK_Ucus_Pilot">
+            <End Role="Pilot" EntitySet="Pilots" />
+            <End Role="Ucus" EntitySet="Ucus" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Rezervasyon_Ucus" Association="Self.FK_Rezervasyon_Ucus">
+            <End Role="Ucus" EntitySet="Ucus" />
+            <End Role="Rezervasyon" EntitySet="Rezervasyons" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Rezervasyon_Yolcu" Association="Self.FK_Rezervasyon_Yolcu">
+            <End Role="Yolcu" EntitySet="Yolcus" />
+            <End Role="Rezervasyon" EntitySet="Rezervasyons" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Yakit_Teknisyen" Association="Self.FK_Yakit_Teknisyen">
+            <End Role="Teknisyen" EntitySet="Teknisyens" />
+            <End Role="Yakit" EntitySet="Yakits" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Ucus_Ucak" Association="Self.FK_Ucus_Ucak">
+            <End Role="Ucak" EntitySet="Ucaks" />
+            <End Role="Ucus" EntitySet="Ucus" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Yakit_Ucus" Association="Self.FK_Yakit_Ucus">
+            <End Role="Ucus" EntitySet="Ucus" />
+            <End Role="Yakit" EntitySet="Yakits" />
+          </AssociationSet>
+          <AssociationSet Name="UcusHostes" Association="Self.UcusHostes">
+            <End Role="Hostes" EntitySet="Hostes" />
+            <End Role="Ucus" EntitySet="Ucus" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="cessnasModelStoreContainer" CdmEntityContainer="cessnasEntities">
+          <EntitySetMapping Name="Havalimanis">
+            <EntityTypeMapping TypeName="cessnasModel.Havalimani">
+              <MappingFragment StoreEntitySet="Havalimani">
+                <ScalarProperty Name="HavalimaniKod" ColumnName="HavalimaniKod" />
+                <ScalarProperty Name="IATAKodu" ColumnName="IATAKodu" />
+                <ScalarProperty Name="Ad" ColumnName="Ad" />
+                <ScalarProperty Name="Sehir" ColumnName="Sehir" />
+                <ScalarProperty Name="Ulke" ColumnName="Ulke" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="HazirlikKontrols">
+            <EntityTypeMapping TypeName="cessnasModel.HazirlikKontrol">
+              <MappingFragment StoreEntitySet="HazirlikKontrol">
+                <ScalarProperty Name="TeknisyenKod" ColumnName="TeknisyenKod" />
+                <ScalarProperty Name="UcakKod" ColumnName="UcakKod" />
+                <ScalarProperty Name="UcusKod" ColumnName="UcusKod" />
+                <ScalarProperty Name="HazirlikZamani" ColumnName="HazirlikZamani" />
+                <ScalarProperty Name="Notlar" ColumnName="Notlar" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Hostes">
+            <EntityTypeMapping TypeName="cessnasModel.Hoste">
+              <MappingFragment StoreEntitySet="Hostes">
+                <ScalarProperty Name="HostesKod" ColumnName="HostesKod" />
+                <ScalarProperty Name="AdSoyad" ColumnName="AdSoyad" />
+                <ScalarProperty Name="DeneyimYil" ColumnName="DeneyimYil" />
+                <ScalarProperty Name="Vardiya" ColumnName="Vardiya" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Koltuks">
+            <EntityTypeMapping TypeName="cessnasModel.Koltuk">
+              <MappingFragment StoreEntitySet="Koltuk">
+                <ScalarProperty Name="UcakKod" ColumnName="UcakKod" />
+                <ScalarProperty Name="KoltukNo" ColumnName="KoltukNo" />
+                <ScalarProperty Name="KoltukTipi" ColumnName="KoltukTipi" />
+                <ScalarProperty Name="DizMesafesi" ColumnName="DizMesafesi" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Pilots">
+            <EntityTypeMapping TypeName="cessnasModel.Pilot">
+              <MappingFragment StoreEntitySet="Pilot">
+                <ScalarProperty Name="PilotKod" ColumnName="PilotKod" />
+                <ScalarProperty Name="AdSoyad" ColumnName="AdSoyad" />
+                <ScalarProperty Name="LisansNo" ColumnName="LisansNo" />
+                <ScalarProperty Name="DeneyimYil" ColumnName="DeneyimYil" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Rezervasyons">
+            <EntityTypeMapping TypeName="cessnasModel.Rezervasyon">
+              <MappingFragment StoreEntitySet="Rezervasyon">
+                <ScalarProperty Name="RezervasyonKod" ColumnName="RezervasyonKod" />
+                <ScalarProperty Name="YolcuKod" ColumnName="YolcuKod" />
+                <ScalarProperty Name="UcusKod" ColumnName="UcusKod" />
+                <ScalarProperty Name="RezervasyonZamani" ColumnName="RezervasyonZamani" />
+                <ScalarProperty Name="Sinif" ColumnName="Sinif" />
+                <ScalarProperty Name="OdemeDurumu" ColumnName="OdemeDurumu" />
+                <ScalarProperty Name="KoltukNo" ColumnName="KoltukNo" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Teknisyens">
+            <EntityTypeMapping TypeName="cessnasModel.Teknisyen">
+              <MappingFragment StoreEntitySet="Teknisyen">
+                <ScalarProperty Name="TeknisyenKod" ColumnName="TeknisyenKod" />
+                <ScalarProperty Name="AdSoyad" ColumnName="AdSoyad" />
+                <ScalarProperty Name="Gorev" ColumnName="Gorev" />
+                <ScalarProperty Name="Vardiya" ColumnName="Vardiya" />
+                <ScalarProperty Name="Eposta" ColumnName="Eposta" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Ucaks">
+            <EntityTypeMapping TypeName="cessnasModel.Ucak">
+              <MappingFragment StoreEntitySet="Ucak">
+                <ScalarProperty Name="UcakKod" ColumnName="UcakKod" />
+                <ScalarProperty Name="KuyrukNo" ColumnName="KuyrukNo" />
+                <ScalarProperty Name="Model" ColumnName="Model" />
+                <ScalarProperty Name="Uretici" ColumnName="Uretici" />
+                <ScalarProperty Name="Kapasite" ColumnName="Kapasite" />
+                <ScalarProperty Name="UretimYili" ColumnName="UretimYili" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Ucus">
+            <EntityTypeMapping TypeName="cessnasModel.Ucu">
+              <MappingFragment StoreEntitySet="Ucus">
+                <ScalarProperty Name="UcusKod" ColumnName="UcusKod" />
+                <ScalarProperty Name="UcusNo" ColumnName="UcusNo" />
+                <ScalarProperty Name="KalkisZamani" ColumnName="KalkisZamani" />
+                <ScalarProperty Name="VarisZamani" ColumnName="VarisZamani" />
+                <ScalarProperty Name="Durum" ColumnName="Durum" />
+                <ScalarProperty Name="UcakKod" ColumnName="UcakKod" />
+                <ScalarProperty Name="PilotKod" ColumnName="PilotKod" />
+                <ScalarProperty Name="KalkisHavalimaniKod" ColumnName="KalkisHavalimaniKod" />
+                <ScalarProperty Name="VarisHavalimaniKod" ColumnName="VarisHavalimaniKod" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Yakits">
+            <EntityTypeMapping TypeName="cessnasModel.Yakit">
+              <MappingFragment StoreEntitySet="Yakit">
+                <ScalarProperty Name="YakitKod" ColumnName="YakitKod" />
+                <ScalarProperty Name="UcusKod" ColumnName="UcusKod" />
+                <ScalarProperty Name="TeknisyenKod" ColumnName="TeknisyenKod" />
+                <ScalarProperty Name="MiktarLitre" ColumnName="MiktarLitre" />
+                <ScalarProperty Name="BirimFiyat" ColumnName="BirimFiyat" />
+                <ScalarProperty Name="ToplamTutar" ColumnName="ToplamTutar" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Yolcus">
+            <EntityTypeMapping TypeName="cessnasModel.Yolcu">
+              <MappingFragment StoreEntitySet="Yolcu">
+                <ScalarProperty Name="YolcuKod" ColumnName="YolcuKod" />
+                <ScalarProperty Name="AdSoyad" ColumnName="AdSoyad" />
+                <ScalarProperty Name="Cinsiyet" ColumnName="Cinsiyet" />
+                <ScalarProperty Name="DogumTarihi" ColumnName="DogumTarihi" />
+                <ScalarProperty Name="Eposta" ColumnName="Eposta" />
+                <ScalarProperty Name="Telefon" ColumnName="Telefon" />
+                <ScalarProperty Name="PasaportNo" ColumnName="PasaportNo" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <AssociationSetMapping Name="UcusHostes" TypeName="cessnasModel.UcusHostes" StoreEntitySet="UcusHostes">
+            <EndProperty Name="Hostes">
+              <ScalarProperty Name="HostesKod" ColumnName="HostesKod" />
+            </EndProperty>
+            <EndProperty Name="Ucus">
+              <ScalarProperty Name="UcusKod" ColumnName="UcusKod" />
+            </EndProperty>
+          </AssociationSetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

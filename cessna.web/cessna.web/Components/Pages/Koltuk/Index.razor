@@ -1,0 +1,62 @@
+﻿@page "/koltuk"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@using Microsoft.EntityFrameworkCore
+@inject CessnasContext Db
+
+<h3>Seats</h3>
+
+<a class="btn btn-success mb-3" href="/koltuk/create">
+    New Seat
+</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Uçak Modeli</th>
+            <th>Koltuk No</th>
+            <th>Tip</th>
+            <th>Diz Mesafesi</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var k in Koltuklar)
+        {
+            <tr>
+                <!-- ✅ ID DEĞİL, CESSNA MODELİ -->
+                <td>@k.UcakKodNavigation.Model</td>
+
+                <td>@k.KoltukNo</td>
+                <td>@(k.KoltukTipi ?? "-")</td>
+                <td>@(k.DizMesafesi.HasValue? k.DizMesafesi + " cm" : "-")</td>
+
+                <td>
+                    <a class="btn btn-sm btn-primary"
+                       href="/koltuk/edit/@k.UcakKod/@k.KoltukNo">
+                        Edit
+                    </a>
+
+                    <a class="btn btn-sm btn-danger ms-1"
+                       href="/koltuk/delete/@k.UcakKod/@k.KoltukNo">
+                        Delete
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    List<Koltuk> Koltuklar = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Koltuklar = await Db.Set<Koltuk>()
+            .Include(k => k.UcakKodNavigation) // 🔴 NAVIGATION ŞART
+            .AsNoTracking()
+            .ToListAsync();
+    }
+}
+

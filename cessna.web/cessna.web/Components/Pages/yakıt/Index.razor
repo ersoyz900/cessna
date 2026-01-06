@@ -1,0 +1,125 @@
+﻿@page "/yakit"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@using Microsoft.EntityFrameworkCore
+@inject CessnasContext Db
+@inject IJSRuntime JS
+
+<h3>Fuel Management</h3>
+
+<a class="btn btn-success mb-3" href="/yakit/create">New Fuel</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Aircraft</th>
+            <th>Flight</th>
+            <th>Fuel (L)</th>
+            <th>Unit Price</th>
+            <th>Total Cost</th>
+            <th>Technician</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var y in Yakits)
+        {
+            <tr>
+                <!-- AIRCRAFT (NULL-SAFE) -->
+                <td>@GetAircraftName(y)</td>
+
+                <!-- FLIGHT NO (NULL-SAFE) -->
+                <td>@(y.UcusKodNavigation?.UcusNo ?? $"UcusKod: {y.UcusKod}")</td>
+
+                <td>@(y.MiktarLitre ?? 0)</td>
+                <td>@(y.BirimFiyat ?? 0)</td>
+                <td><strong>@y.ToplamTutar</strong></td>
+
+                <!-- TECHNICIAN NAME (NULL-SAFE) -->
+                <td>@(y.TeknisyenKodNavigation?.AdSoyad ?? $"TeknisyenKod: {y.TeknisyenKod}")</td>
+
+                <td>
+                    <a class="btn btn-sm btn-primary" href="/yakit/edit/@y.YakitKod">Edit</a>
+                    <a class="btn btn-sm btn-danger ms-1" href="/yakit/delete/@y.YakitKod">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<hr />
+<h5>Total Fuel Cost per Aircraft</h5>
+<canvas id="fuelChart" height="120"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    window.chart = null;
+    window.drawFuelChart = (labels, values) => {
+        const canvas = document.getElementById("fuelChart");
+        if (!canvas) return;
+
+        if (window.chart) window.chart.destroy();
+
+        const ctx = canvas.getContext("2d");
+        window.chart = new Chart(ctx, {
+            type: 'bar',
+            data: { labels, datasets: [{ data: values, backgroundColor: '#0dcaf0' }] },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    };
+</script>
+
+@code {
+    List<Yakit> Yakits = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Yakits = await Db.Set<Yakit>()
+            .Include(y => y.TeknisyenKodNavigation)
+            .Include(y => y.UcusKodNavigation)
+                .ThenInclude(u => u.UcakKodNavigation) // UcakKod nullable -> navigation null olabilir, ama include şart
+            .AsNoTracking()
+            .ToListAsync();
+    }
+
+    // ✅ UÇAK ADI ÜRETEN NULL-SAFE HELPER
+    private static string GetAircraftName(Yakit y)
+    {
+        var ucus = y.UcusKodNavigation;
+        var ucak = ucus?.UcakKodNavigation;
+
+        if (ucak == null)
+            return "No aircraft assigned";
+
+        var kuyruk = string.IsNullOrWhiteSpace(ucak.KuyrukNo) ? "?" : ucak.KuyrukNo;
+        var model = string.IsNullOrWhiteSpace(ucak.Model) ? "?" : ucak.Model;
+
+        return $"{kuyruk} ({model})";
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (Yakits.Count == 0) return;
+
+        // ✅ GRAFİKTE DE NULL-SAFE GROUPING
+        var grouped = Yakits
+            .GroupBy(y => GetAircraftName(y))
+            .Select(g => new
+            {
+                Aircraft = g.Key,
+                Total = g.Sum(x => x.ToplamTutar)
+            })
+            .OrderBy(x => x.Aircraft)
+            .ToList();
+
+        await JS.InvokeVoidAsync(
+            "drawFuelChart",
+            grouped.Select(x => x.Aircraft).ToArray(),
+            grouped.Select(x => x.Total).ToArray()
+        );
+    }
+}

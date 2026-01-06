@@ -1,0 +1,54 @@
+﻿@page "/ucak/delete/{id:int}"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@using Microsoft.EntityFrameworkCore
+@inject CessnasContext Db
+@inject NavigationManager Nav
+
+<h3>Delete Aircraft</h3>
+
+@if (!string.IsNullOrEmpty(Hata))
+{
+    <div class="alert alert-danger">@Hata</div>
+}
+
+@if (ModelEntity == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <p>Delete aircraft <strong>@ModelEntity.KuyrukNo</strong>?</p>
+
+    <button type="button" class="btn btn-danger" @onclick="ConfirmDelete">Delete</button>
+    <a class="btn btn-secondary ms-2" href="/ucak">Cancel</a>
+}
+
+@code {
+    [Parameter] public int id { get; set; }
+    Ucak? ModelEntity;
+    string? Hata;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ModelEntity = await Db.Set<Ucak>()
+                              .FirstOrDefaultAsync(x => x.UcakKod == id);
+    }
+
+    async Task ConfirmDelete()
+    {
+        if (ModelEntity == null) return;
+
+        try
+        {
+            Db.Set<Ucak>().Remove(ModelEntity);
+            await Db.SaveChangesAsync();
+            Nav.NavigateTo("/ucak", forceLoad: true);
+        }
+        catch
+        {
+            Hata = "This aircraft cannot be deleted because it is used in flights.";
+        }
+    }
+}

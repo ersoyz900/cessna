@@ -1,0 +1,61 @@
+﻿@page "/hazirlikkontrol"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@using Microsoft.EntityFrameworkCore
+@inject CessnasContext Db
+
+<h3>Prepare / Inspect</h3>
+
+<a class="btn btn-success mb-3" href="/hazirlikkontrol/create">
+    New Inspection
+</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Technician</th>
+            <th>Aircraft</th>
+            <th>Flight</th>
+            <th>Time</th>
+            <th>Notes</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var h in Liste)
+        {
+            <tr>
+                <td>@h.TeknisyenKodNavigation.AdSoyad</td>
+                <td>@h.UcakKodNavigation.Model (@h.UcakKodNavigation.KuyrukNo)</td>
+                <td>@h.UcusKodNavigation.UcusNo</td>
+                <td>@(h.HazirlikZamani?.ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
+                <td>@(h.Notlar ?? "-")</td>
+                <td>
+                    <a class="btn btn-sm btn-primary"
+                       href="/hazirlikkontrol/edit/@h.TeknisyenKod/@h.UcakKod/@h.UcusKod">
+                        Edit
+                    </a>
+                    <a class="btn btn-sm btn-danger ms-1"
+                       href="/hazirlikkontrol/delete/@h.TeknisyenKod/@h.UcakKod/@h.UcusKod">
+                        Delete
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    List<HazirlikKontrol> Liste = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Liste = await Db.Set<HazirlikKontrol>()
+            .Include(x => x.TeknisyenKodNavigation)
+            .Include(x => x.UcakKodNavigation)
+            .Include(x => x.UcusKodNavigation)
+            .AsNoTracking()
+            .ToListAsync();
+    }
+}

@@ -1,0 +1,68 @@
+﻿@page "/teknisyen/edit/{id:int}"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@using Microsoft.EntityFrameworkCore
+@inject CessnasContext Db
+@inject NavigationManager Nav
+
+<h3>Edit Technician</h3>
+
+@if (!string.IsNullOrEmpty(Hata))
+{
+    <div class="alert alert-danger">@Hata</div>
+}
+
+@if (Model == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div class="mb-2">
+        <label>Ad Soyad</label>
+        <input class="form-control" @bind="Model.AdSoyad" />
+    </div>
+
+    <div class="mb-2">
+        <label>Görev</label>
+        <input class="form-control" @bind="Model.Gorev" />
+    </div>
+
+    <div class="mb-2">
+        <label>Vardiya</label>
+        <input class="form-control" @bind="Model.Vardiya" />
+    </div>
+
+    <div class="mb-2">
+        <label>E-posta</label>
+        <input class="form-control" @bind="Model.Eposta" />
+    </div>
+
+    <button class="btn btn-primary" @onclick="Save">Save</button>
+    <a class="btn btn-secondary ms-2" href="/teknisyen">Cancel</a>
+}
+
+@code {
+    [Parameter] public int id { get; set; }
+
+    Teknisyen? Model;
+    string? Hata;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Model = await Db.Set<Teknisyen>()
+                        .FirstOrDefaultAsync(x => x.TeknisyenKod == id);
+
+        if (Model == null)
+            Hata = "Technician not found.";
+    }
+
+    void Save()
+    {
+        if (Model == null) return;
+
+        Db.SaveChanges();
+        Nav.NavigateTo("/teknisyen", forceLoad: true);
+    }
+}

@@ -1,0 +1,61 @@
+﻿@page "/havalimani/delete/{id:int}"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@using Microsoft.EntityFrameworkCore
+@inject CessnasContext Db
+@inject NavigationManager Nav
+
+<h3>Delete Airport</h3>
+
+@if (!string.IsNullOrEmpty(Hata))
+{
+    <div class="alert alert-danger">@Hata</div>
+}
+
+@if (Model == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <p>
+        Delete airport
+        <strong>@Model.Ad (@Model.IATAKodu)</strong>?
+    </p>
+
+    <button type="button" class="btn btn-danger" @onclick="ConfirmDelete">
+        Delete
+    </button>
+
+    <a class="btn btn-secondary ms-2" href="/havalimani">Cancel</a>
+}
+
+@code {
+    [Parameter] public int id { get; set; }
+
+    Havalimani? Model;
+    string? Hata;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Model = await Db.Set<Havalimani>()
+                        .FirstOrDefaultAsync(x => x.HavalimaniKod == id);
+    }
+
+    async Task ConfirmDelete()
+    {
+        if (Model == null) return;
+
+        try
+        {
+            Db.Set<Havalimani>().Remove(Model);
+            await Db.SaveChangesAsync();
+            Nav.NavigateTo("/havalimani", forceLoad: true);
+        }
+        catch
+        {
+            Hata = "Bu havalimanı uçuşlarda kullanıldığı için silinemez.";
+        }
+    }
+}

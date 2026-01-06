@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="e2ac5d479adc432e8e2f1c1cd0300ca6" Name="Diagram1" ZoomLevel="67">
+        <EntityTypeShape EntityType="cessnasModel.Havalimani" Width="1.5" PointX="3.75" PointY="2.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="cessnasModel.HazirlikKontrol" Width="1.5" PointX="3" PointY="6.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="cessnasModel.Hoste" Width="1.5" PointX="3.75" PointY="12.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="cessnasModel.Koltuk" Width="1.5" PointX="3" PointY="9.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="cessnasModel.Pilot" Width="1.5" PointX="3.75" PointY="15.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="cessnasModel.Rezervasyon" Width="1.5" PointX="8.25" PointY="6.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="cessnasModel.Teknisyen" Width="1.5" PointX="0.75" PointY="2" IsExpanded="true" />
+        <EntityTypeShape EntityType="cessnasModel.Ucak" Width="1.5" PointX="0.75" PointY="6.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="cessnasModel.Ucu" Width="1.5" PointX="6" PointY="5.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="cessnasModel.Yakit" Width="1.5" PointX="11.25" PointY="6.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="cessnasModel.Yolcu" Width="1.5" PointX="6" PointY="1.25" IsExpanded="true" />
+        <AssociationConnector Association="cessnasModel.FK_Ucus_KalkisHavalimani" ManuallyRouted="false" />
+        <AssociationConnector Association="cessnasModel.FK_Ucus_VarisHavalimani" ManuallyRouted="false" />
+        <AssociationConnector Association="cessnasModel.FK_HK_Teknisyen" ManuallyRouted="false" />
+        <AssociationConnector Association="cessnasModel.FK_HK_Ucak" ManuallyRouted="false" />
+        <AssociationConnector Association="cessnasModel.FK_HK_Ucus" ManuallyRouted="false" />
+        <AssociationConnector Association="cessnasModel.FK_Koltuk_Ucak" ManuallyRouted="false" />
+        <AssociationConnector Association="cessnasModel.FK_Ucus_Pilot" ManuallyRouted="false" />
+        <AssociationConnector Association="cessnasModel.FK_Rezervasyon_Ucus" ManuallyRouted="false" />
+        <AssociationConnector Association="cessnasModel.FK_Rezervasyon_Yolcu" ManuallyRouted="false" />
+        <AssociationConnector Association="cessnasModel.FK_Yakit_Teknisyen" ManuallyRouted="false" />
+        <AssociationConnector Association="cessnasModel.FK_Ucus_Ucak" ManuallyRouted="false" />
+        <AssociationConnector Association="cessnasModel.FK_Yakit_Ucus" ManuallyRouted="false" />
+        <AssociationConnector Association="cessnasModel.UcusHostes" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

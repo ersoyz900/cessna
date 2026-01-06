@@ -1,0 +1,60 @@
+﻿@page "/koltuk/delete/{ucakKod:int}/{koltukNo}"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@using Microsoft.EntityFrameworkCore
+@inject CessnasContext Db
+@inject NavigationManager Nav
+
+<h3>Delete Seat</h3>
+
+@if (!string.IsNullOrEmpty(Hata))
+{
+    <div class="alert alert-danger">@Hata</div>
+}
+
+@if (Model == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <p>
+        Koltuk <strong>@Model.KoltukNo</strong> silinsin mi?
+    </p>
+
+    <button class="btn btn-danger" @onclick="ConfirmDelete">Delete</button>
+    <a class="btn btn-secondary ms-2" href="/koltuk">Cancel</a>
+}
+
+@code {
+    [Parameter] public int ucakKod { get; set; }
+    [Parameter] public string koltukNo { get; set; } = null!;
+
+    Koltuk? Model;
+    string? Hata;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Model = await Db.Set<Koltuk>()
+                        .FirstOrDefaultAsync(x =>
+                            x.UcakKod == ucakKod &&
+                            x.KoltukNo == koltukNo);
+    }
+
+    async Task ConfirmDelete()
+    {
+        if (Model == null) return;
+
+        try
+        {
+            Db.Set<Koltuk>().Remove(Model);
+            await Db.SaveChangesAsync();
+            Nav.NavigateTo("/koltuk", forceLoad: true);
+        }
+        catch
+        {
+            Hata = "Bu koltuk başka kayıtlarla ilişkili olduğu için silinemiyor.";
+        }
+    }
+}

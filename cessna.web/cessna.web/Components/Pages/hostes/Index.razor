@@ -1,0 +1,58 @@
+﻿@page "/hostes"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@using Microsoft.EntityFrameworkCore
+@inject CessnasContext Db
+
+<h3>Hostesler</h3>
+
+<a class="btn btn-success mb-3" href="/hostes/create">
+    Yeni Hostes
+</a>
+
+@if (Hostesler == null)
+{
+    <p>Yükleniyor...</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Ad Soyad</th>
+                <th>Deneyim (Yıl)</th>
+                <th>Vardiya</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var h in Hostesler)
+            {
+                <tr>
+                    <td>@h.AdSoyad</td>
+                    <td>@h.DeneyimYil</td>
+                    <td>@h.Vardiya</td>
+                    <td>
+                        <a class="btn btn-sm btn-primary"
+                           href="/hostes/edit/@h.HostesKod">Edit</a>
+
+                        <a class="btn btn-sm btn-danger ms-1"
+                           href="/hostes/delete/@h.HostesKod">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    List<Hoste>? Hostesler;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Hostesler = await Db.Set<Hoste>()
+                            .AsNoTracking()
+                            .ToListAsync();
+    }
+}

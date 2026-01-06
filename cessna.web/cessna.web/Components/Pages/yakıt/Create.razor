@@ -1,0 +1,78 @@
+﻿@page "/yakit/create"
+@rendermode InteractiveServer
+
+@using cessna.web.Models
+@using Microsoft.EntityFrameworkCore
+@inject CessnasContext Db
+@inject NavigationManager Nav
+
+<h3>Create Fuel</h3>
+
+<div class="mb-2">
+    <label>Flight</label>
+    <select class="form-select" @bind="UcusKod">
+        <option value="">Select...</option>
+        @foreach (var u in Ucuslar)
+        {
+            <option value="@u.UcusKod">@u.UcusNo</option>
+        }
+    </select>
+</div>
+
+<div class="mb-2">
+    <label>Technician</label>
+    <select class="form-select" @bind="TeknisyenKod">
+        <option value="">Select...</option>
+        @foreach (var t in Teknisyenler)
+        {
+            <option value="@t.TeknisyenKod">@t.AdSoyad</option>
+        }
+    </select>
+</div>
+
+<div class="mb-2">
+    <label>Fuel (L)</label>
+    <input type="number" class="form-control" @bind="MiktarLitre" />
+</div>
+
+<div class="mb-2">
+    <label>Unit Price</label>
+    <input type="number" class="form-control" @bind="BirimFiyat" />
+</div>
+
+<button class="btn btn-primary" @onclick="Save">Save</button>
+<a class="btn btn-secondary ms-2" href="/yakit">Cancel</a>
+
+@code {
+    int? UcusKod;
+    int? TeknisyenKod;
+    double? MiktarLitre;
+    double? BirimFiyat;
+
+    List<Ucu> Ucuslar = new();
+    List<Teknisyen> Teknisyenler = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Ucuslar = await Db.Set<Ucu>().ToListAsync();
+        Teknisyenler = await Db.Set<Teknisyen>().ToListAsync();
+    }
+
+    async Task Save()
+    {
+        var y = new Yakit
+        {
+            UcusKod = UcusKod!.Value,
+            TeknisyenKod = TeknisyenKod!.Value,
+            MiktarLitre = MiktarLitre,
+            BirimFiyat = BirimFiyat,
+            ToplamTutar = (MiktarLitre ?? 0) * (BirimFiyat ?? 0) // ✅ OTOMATİK
+        };
+
+        Db.Set<Yakit>().Add(y);
+        await Db.SaveChangesAsync();
+
+        Nav.NavigateTo("/yakit", true); // 🔥 grafik güncellenir
+    }
+}
+
